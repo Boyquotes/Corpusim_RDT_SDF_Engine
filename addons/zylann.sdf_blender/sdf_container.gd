@@ -6,6 +6,15 @@ var SDFItem = load("res://addons/zylann.sdf_blender/sdf_item.gd")
 
 const SHADER_PATH = "res://addons/zylann.sdf_blender/raymarch.gdshader"
 
+var player : CharacterBody3D 
+
+class Cutaway:
+	var location := Vector3()
+	var size : float = 4.0
+	func _init(l, s):
+		location = l
+		size = s
+	
 
 class ShaderTemplate:
 	var before_uniforms := ""
@@ -20,6 +29,7 @@ var _shader_material : ShaderMaterial
 var _need_shader_update := true
 var _need_objects_update := true
 
+var _cutaways:  Array = []
 
 func _ready():
 	_shader_template = _load_shader_template(SHADER_PATH)
@@ -29,8 +39,14 @@ func _ready():
 	pm.flip_faces = true
 	mesh = pm
 	
+	player = get_node("%Player")
+	var ca := Cutaway.new(player.position,4.0)
+	_cutaways.push_back(ca)
+	
 	set_process(true)
 	_update_shader()
+	
+	
 
 
 func set_object_param(so, param_index: int, value):
@@ -80,9 +96,11 @@ func _update_shader():
 	# so I just create a new material
 	_shader_material = ShaderMaterial.new()
 
-	var code := _generate_shader_code(_objects, _shader_template)
+	_cutaways[0].location = player.position
+	
+	var code := _generate_shader_code(_objects, _cutaways, _shader_template)
 	# This is for debugging
-	#_debug_dump_text_file("generated_shader.txt", code)
+	_debug_dump_text_file("generated_shader.txt", code)
 
 	shader.code = code
 	_shader_material.set_shader(shader)
@@ -212,12 +230,15 @@ static func _get_shape_code(obj, pos_code: String) -> String:
 	return ""
 
 
-static func _generate_shader_code(objects : Array, template: ShaderTemplate) -> String:
+static func _generate_shader_code(objects : Array, cutaways :Array, template: ShaderTemplate) -> String:
+	
 	var uniforms := ""
 	var scene := ""
 
 	var fcount := 0
 
+	
+	
 	for object_index in len(objects):
 		var obj = objects[object_index] 
 		#if not obj.active:
@@ -238,7 +259,18 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate) -> 
 		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), " * vec4(p, 1.0)).xyz")
 		var indent = "\t"
 		
-		var shape_code := _get_shape_code(obj, pos_code)
+		var shape_code : String = _get_shape_code(obj, pos_code)
+		
+		# cutaway tools applied. iterate through all cutaways
+		
+		#"get_sphere(", pos_code, ", vec3(0.0), ", _get_param_code(obj, SDF.PARAM_RADIUS), ")"
+		
+		# probe cutaway
+		var cut_code1 : String = str("get_sphere(p,world_cam_pos,", "3.)")
+		
+		# placed cutaway
+		#var cut_code2 : String = str("get_sphere(p,vec3" , cutaways[0].location, ", ",  "2.)")
+		shape_code = str("max(-1.*",cut_code1,", ", shape_code,")");
 		
 		match obj.operation:
 			SDF.OP_UNION:

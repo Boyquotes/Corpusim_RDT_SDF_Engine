@@ -86,8 +86,9 @@ vec3 repeat_domain(vec3 p, vec3 c, vec3 l) {
 //<functions>
 //</functions>
 
-vec4 get_scene(vec3 p, float time) {
+vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	vec4 s = vec4(1.0, 1.0, 1.0, 99999.0);
+	
 	
 	//<scene>
 	s.w = sharp_union(s.w, get_sphere(p, vec3(0.0), 1.0));
@@ -101,23 +102,23 @@ vec4 get_scene(vec3 p, float time) {
 	return s;
 }
 
-vec3 get_normal(vec3 p, float time) {
-	float d = get_scene(p, time).w;
+vec3 get_normal(vec3 p, float time, vec3 world_cam_pos) {
+	float d = get_scene(p, time, world_cam_pos).w;
 	vec2 e = vec2(NORMAL_PRECISION, 0.0);
 	vec3 n = d - vec3(
-		get_scene(p - e.xyy, time).w,
-		get_scene(p - e.yxy, time).w,
-		get_scene(p - e.yyx, time).w);
+		get_scene(p - e.xyy, time, world_cam_pos).w,
+		get_scene(p - e.yxy, time, world_cam_pos).w,
+		get_scene(p - e.yyx, time, world_cam_pos).w);
 	return normalize(n);
 }
 
-vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time) {
+vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, vec3 world_cam_pos) {
 	// Sphere marching
 	float d = 0.0;
 	vec3 rgb;
 	for (int i = 0; i < MAX_STEPS; ++i) {
 		vec3 p = ray_origin + ray_dir * d;
-		vec4 scene_info = get_scene(p, time);
+		vec4 scene_info = get_scene(p, time, world_cam_pos);
 		rgb = scene_info.rgb;
 		float ds = scene_info.w;
 		d += ds;
@@ -127,7 +128,7 @@ vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time) {
 	}
 
 	vec3 hit_pos = ray_origin + ray_dir * d;
-	out_normal = get_normal(hit_pos, time);
+	out_normal = get_normal(hit_pos, time, world_cam_pos);
 
 	return vec4(rgb, d);
 }
@@ -146,7 +147,7 @@ void fragment() {
 	float time = 0.0;
 	
 	vec3 normal;
-	vec4 rm = raymarch(ray_origin, ray_dir, normal, time);
+	vec4 rm = raymarch(ray_origin, ray_dir, normal, time, world_cam_pos);
 	float d = rm.w;
 	
 	if (d > MAX_DISTANCE) {
