@@ -4,6 +4,8 @@ shader_type spatial;
 //<uniforms>
 //</uniforms>
 
+uniform float shrink = 1.0;
+
 const int MAX_STEPS = 64;
 const float MAX_DISTANCE = 100.0;
 const float SURFACE_DISTANCE = 0.005;

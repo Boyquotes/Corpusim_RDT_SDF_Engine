@@ -13,11 +13,12 @@ var speed := MAX_SPEED
 const SHRINK_MIN := 1.0
 const SHRINK_MAX := 5.0
 var shrink := SHRINK_MIN
+var shrink_target := shrink
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
-func _process(delta):
+func _process(_delta):
 	process_input()
 	
 func process_input():
@@ -40,7 +41,7 @@ func _input(event):
 
 		
 
-func _physics_process(delta):
+func _physics_process(_delta):
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
@@ -56,10 +57,13 @@ func _physics_process(delta):
 			speed = MAX_SPEED
 			
 	if Input.is_action_just_released("shrink_increase"):
-		shrink = clampf(shrink+.15,SHRINK_MIN, SHRINK_MAX)
-		sdf_container.set_shrink(shrink)
+		shrink_target = clampf(shrink_target+.15,SHRINK_MIN, SHRINK_MAX)
 	if Input.is_action_just_released("shrink_decrease"):
-		shrink = clampf(shrink-.15,SHRINK_MIN, SHRINK_MAX)
+		shrink_target = clampf(shrink_target-.15,SHRINK_MIN, SHRINK_MAX)
+		
+	var shrink_delta = abs(shrink_target-shrink)
+	if shrink_delta > .01:
+		shrink = move_toward(shrink, shrink_target, shrink_delta*.3)
 		sdf_container.set_shrink(shrink)
 		
 	if Input.is_action_pressed("ui_accept"):

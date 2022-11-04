@@ -31,7 +31,6 @@ var _need_objects_update := true
 
 var _cutaways:  Array = []
 
-var shrink : float = 1.0
 
 func _ready():
 	_shader_template = _load_shader_template(SHADER_PATH)
@@ -48,10 +47,8 @@ func _ready():
 	set_process(true)
 	_update_shader()
 	
-func set_shrink(val):
-	shrink = val
-	_schedule_shader_update()
-	print("shrink: ", shrink)
+func set_shrink(shrink_val):
+	_shader_material.set_shader_parameter("shrink", shrink_val)
 
 
 func set_object_param(so, param_index: int, value):
@@ -103,7 +100,7 @@ func _update_shader():
 
 	_cutaways[0].location = player.position
 	
-	var code := _generate_shader_code(_objects, _shader_template, _cutaways, shrink)
+	var code := _generate_shader_code(_objects, _shader_template, _cutaways)
 	# This is for debugging
 	_debug_dump_text_file("generated_shader.txt", code)
 
@@ -209,15 +206,15 @@ static func _godot_type_to_fcount(type: int) -> int:
 	return 0
 
 
-static func _get_shape_code(obj, pos_code: String, shrink) -> String:
+static func _get_shape_code(obj, pos_code: String) -> String:
 	match obj.shape:
 		SDF.SHAPE_SPHERE:
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
-				_get_param_code(obj, SDF.PARAM_RADIUS),"* %0.1f" % (shrink*2),")")
+				_get_param_code(obj, SDF.PARAM_RADIUS),"* 2.0 * shrink)")
 
 		SDF.SHAPE_BOX:
 			return str("get_rounded_box(", pos_code, 
-				", ", _get_param_code(obj, SDF.PARAM_SIZE), "* %0.1f" % shrink,
+				", ", _get_param_code(obj, SDF.PARAM_SIZE), " * shrink ",
 				", ", _get_param_code(obj, SDF.PARAM_ROUNDING), ")")
 
 		SDF.SHAPE_TORUS:
@@ -235,7 +232,7 @@ static func _get_shape_code(obj, pos_code: String, shrink) -> String:
 	return ""
 
 
-static func _generate_shader_code(objects : Array, template: ShaderTemplate, cutaways :Array, shrink:float) -> String:
+static func _generate_shader_code(objects : Array, template: ShaderTemplate, cutaways :Array) -> String:
 	
 	var uniforms := ""
 	var scene := ""
@@ -264,7 +261,7 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), " * vec4(p, 1.0)).xyz")
 		var indent = "\t"
 		
-		var shape_code : String = _get_shape_code(obj, pos_code, shrink)
+		var shape_code : String = _get_shape_code(obj, pos_code)
 		
 		# cutaway tools applied. iterate through all cutaways
 		
