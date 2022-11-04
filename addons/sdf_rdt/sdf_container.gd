@@ -2,9 +2,9 @@
 extends MeshInstance3D
 
 const SDF = preload("./sdf.gd")
-var SDFItem = load("res://addons/zylann.sdf_blender/sdf_item.gd")
+var SDFItem = load("res://addons/sdf_rdt/sdf_item.gd")
 
-const SHADER_PATH = "res://addons/zylann.sdf_blender/raymarch.gdshader"
+const SHADER_PATH = "res://addons/sdf_rdt/raymarch.gdshader"
 
 var player : CharacterBody3D 
 
@@ -210,7 +210,7 @@ static func _get_shape_code(obj, pos_code: String) -> String:
 	match obj.shape:
 		SDF.SHAPE_SPHERE:
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
-				_get_param_code(obj, SDF.PARAM_RADIUS),"* 2.0 * shrink)")
+				_get_param_code(obj, SDF.PARAM_RADIUS)," * shrink)")
 
 		SDF.SHAPE_BOX:
 			return str("get_rounded_box(", pos_code, 

@@ -63,7 +63,7 @@ func _physics_process(_delta):
 		
 	var shrink_delta = abs(shrink_target-shrink)
 	if shrink_delta > .01:
-		shrink = move_toward(shrink, shrink_target, shrink_delta*.3)
+		shrink = move_toward(shrink, shrink_target, shrink_delta*.1)
 		sdf_container.set_shrink(shrink)
 		
 	if Input.is_action_pressed("ui_accept"):

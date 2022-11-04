@@ -1,0 +1,3 @@
+Comment: SDF Blender plugin for Godot Engine
+Copyright: 2020, Marc Gilleron
+License: The MIT License
