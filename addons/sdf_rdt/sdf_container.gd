@@ -258,7 +258,7 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 			uniforms += str("uniform ", stype, " ", param.uniform, ";\n")
 			fcount += _godot_type_to_fcount(type)
 
-		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), " * vec4(p, 1.0)).xyz")
+		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), " * vec4(p, shrink)).xyz")
 		var indent = "\t"
 		
 		var shape_code : String = _get_shape_code(obj, pos_code)

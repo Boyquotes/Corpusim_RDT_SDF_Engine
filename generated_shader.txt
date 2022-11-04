@@ -114,11 +114,11 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	vec4 s = vec4(1.0, 1.0, 1.0, 99999.0);
 	
 	
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_rounded_box((u_shape0_transform * vec4(p, 1.0)).xyz, u_shape0_size * shrink , u_shape0_rounding)), s.rgb, u_shape0_color.rgb, u_shape0_smoothness);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_rounded_box((u_shape1_transform * vec4(p, 1.0)).xyz, u_shape1_size * shrink , u_shape1_rounding)), s.rgb, u_shape1_color.rgb, u_shape1_smoothness);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_sphere((u_shape2_transform * vec4(p, 1.0)).xyz, vec3(0.0), u_shape2_radius * shrink)), s.rgb, u_shape2_color.rgb, u_shape2_smoothness);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_rounded_box((u_shape3_transform * vec4(p, 1.0)).xyz, u_shape3_size * shrink , u_shape3_rounding)), s.rgb, u_shape3_color.rgb, u_shape3_smoothness);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_torus((u_shape4_transform * vec4(p, 1.0)).xyz, vec2(u_shape4_radius, u_shape4_thickness))), s.rgb, u_shape4_color.rgb, u_shape4_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_rounded_box((u_shape0_transform * vec4(p, shrink)).xyz, u_shape0_size * shrink , u_shape0_rounding)), s.rgb, u_shape0_color.rgb, u_shape0_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_rounded_box((u_shape1_transform * vec4(p, shrink)).xyz, u_shape1_size * shrink , u_shape1_rounding)), s.rgb, u_shape1_color.rgb, u_shape1_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_sphere((u_shape2_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape2_radius * shrink)), s.rgb, u_shape2_color.rgb, u_shape2_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_rounded_box((u_shape3_transform * vec4(p, shrink)).xyz, u_shape3_size * shrink , u_shape3_rounding)), s.rgb, u_shape3_color.rgb, u_shape3_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5), get_torus((u_shape4_transform * vec4(p, shrink)).xyz, vec2(u_shape4_radius, u_shape4_thickness))), s.rgb, u_shape4_color.rgb, u_shape4_smoothness);
 	
 	return s;
 }
