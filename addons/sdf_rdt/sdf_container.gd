@@ -102,7 +102,7 @@ func _update_shader():
 	
 	var code := _generate_shader_code(_objects, _shader_template, _cutaways)
 	# This is for debugging
-	_debug_dump_text_file("generated_shader.txt", code)
+	#_debug_dump_text_file("generated_shader.txt", code)
 
 	shader.code = code
 	_shader_material.set_shader(shader)
