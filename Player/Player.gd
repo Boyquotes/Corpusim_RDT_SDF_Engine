@@ -9,6 +9,7 @@ const MOUSE_SENSITIVITY := 0.0015
 var speed := MAX_SPEED
 
 @onready var sdf_container = $"%SDFContainer"
+@onready var hierarch = $"%Hierarch"
 
 const SHRINK_MIN := 1.0
 const SHRINK_MAX := 5.0
@@ -65,6 +66,7 @@ func _physics_process(_delta):
 	if shrink_delta > .01:
 		shrink = move_toward(shrink, shrink_target, shrink_delta*.1)
 		sdf_container.set_shrink(shrink)
+		hierarch.set_shrink(shrink)
 		
 	if Input.is_action_pressed("ui_accept"):
 		velocity.y = speed

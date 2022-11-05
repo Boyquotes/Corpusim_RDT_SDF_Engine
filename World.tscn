@@ -1,12 +1,13 @@
-[gd_scene load_steps=12 format=3 uid="uid://d1ghg8r3bpboh"]
+[gd_scene load_steps=13 format=3 uid="uid://d1ghg8r3bpboh"]
 
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_container.gd" id="1_4lvc6"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_box.gd" id="2_4f4q8"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_sphere.gd" id="3_nom7a"]
 [ext_resource type="PackedScene" uid="uid://bdm56ujj65teb" path="res://Player/Player.tscn" id="4_o2jjx"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_torus.gd" id="5_ev7mj"]
+[ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="6_eayxi"]
 
-[sub_resource type="Shader" id="Shader_fwv4j"]
+[sub_resource type="Shader" id="Shader_yqlqn"]
 code = "shader_type spatial;
 //render_mode unshaded;//, depth_draw_opaque;
 
@@ -198,15 +199,15 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_8fc48"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1djww"]
 render_priority = 0
-shader = SubResource("Shader_fwv4j")
+shader = SubResource("Shader_yqlqn")
 shader_parameter/u_shape4_transform = Transform3D(0.409923, -0.91212, 0, 0.912119, 0.409923, 0, 0, 0, 1, 0.520795, -0.234054, 0)
 shader_parameter/u_shape4_thickness = 0.505737
 shader_parameter/u_shape4_smoothness = 0.2
 shader_parameter/u_shape4_radius = 3.87791
 shader_parameter/u_shape4_color = Color(0.356863, 0.305882, 0.54902, 1)
-shader_parameter/u_shape3_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+shader_parameter/u_shape3_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.74273, -0.511418, 2.03447)
 shader_parameter/u_shape3_smoothness = 0.2
 shader_parameter/u_shape3_size = Vector3(1, 1, 1)
 shader_parameter/u_shape3_rounding = 0.0
@@ -227,7 +228,7 @@ shader_parameter/u_shape0_rounding = 0.0
 shader_parameter/u_shape0_color = Color(0, 0.203922, 1, 1)
 shader_parameter/shrink = null
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_y8hvo"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_aprjs"]
 flip_faces = true
 orientation = 2
 
@@ -253,9 +254,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
-material_override = SubResource("ShaderMaterial_8fc48")
+material_override = SubResource("ShaderMaterial_1djww")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_y8hvo")
+mesh = SubResource("PlaneMesh_aprjs")
 script = ExtResource("1_4lvc6")
 
 [node name="SDFBox" type="Node3D" parent="SDFContainer"]
@@ -274,7 +275,7 @@ rounding = 0.0
 operation = 0
 color = Color(0.0431373, 1, 0.329412, 1)
 
-[node name="SDFSphere" type="Node3D" parent="SDFContainer"]
+[node name="Pinkball" type="Node3D" parent="SDFContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.33023, 0, -3.46965)
 script = ExtResource("3_nom7a")
 radius = 2.14419
@@ -282,6 +283,7 @@ operation = 0
 color = Color(1, 0.152941, 0.643137, 1)
 
 [node name="SDFBox3" type="Node3D" parent="SDFContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.74273, 0.511418, -2.03447)
 script = ExtResource("2_4f4q8")
 size = Vector3(1, 1, 1)
 rounding = 0.0
@@ -300,3 +302,6 @@ transform = Transform3D(-0.111727, -0.0785847, 0.990627, 0.0413513, 0.995637, 0.
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_gslwi")
+
+[node name="Hierarch" parent="." instance=ExtResource("6_eayxi")]
+unique_name_in_owner = true

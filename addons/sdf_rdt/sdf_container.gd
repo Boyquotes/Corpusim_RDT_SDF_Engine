@@ -30,6 +30,7 @@ var _need_shader_update := true
 var _need_objects_update := true
 
 var _cutaways:  Array = []
+var shrink : float = 1.0
 
 
 func _ready():
@@ -49,6 +50,7 @@ func _ready():
 	
 func set_shrink(shrink_val):
 	_shader_material.set_shader_parameter("shrink", shrink_val)
+	shrink = shrink_val
 
 
 func set_object_param(so, param_index: int, value):
@@ -73,6 +75,7 @@ func schedule_structural_update():
 func _schedule_shader_update():
 	_need_shader_update = true
 	set_process(true)
+	print("will update shaeerder")
 
 
 func _process(delta):
@@ -101,6 +104,7 @@ func _update_shader():
 	_cutaways[0].location = player.position
 	
 	var code := _generate_shader_code(_objects, _shader_template, _cutaways)
+	set_shrink(shrink)
 	# This is for debugging
 	#_debug_dump_text_file("generated_shader.txt", code)
 
@@ -224,9 +228,9 @@ static func _get_shape_code(obj, pos_code: String) -> String:
 
 		SDF.SHAPE_CYLINDER:
 			return str("get_rounded_cylinder(", pos_code, 
-				", ", _get_param_code(obj, SDF.PARAM_RADIUS), 
+				", ", _get_param_code(obj, SDF.PARAM_RADIUS),"* shrink", 
 				", ", _get_param_code(obj, SDF.PARAM_ROUNDING),
-				", ", _get_param_code(obj, SDF.PARAM_HEIGHT), ")")
+				", ", _get_param_code(obj, SDF.PARAM_HEIGHT), "* shrink)")
 		_:
 			assert(false)
 	return ""
