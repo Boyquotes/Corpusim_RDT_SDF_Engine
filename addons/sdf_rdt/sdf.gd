@@ -19,6 +19,7 @@ const PARAM_SIZE = 4
 const PARAM_THICKNESS = 5
 const PARAM_HEIGHT = 6
 const PARAM_ROUNDING = 7
+const PARAM_LAYER = 8
 
 
 const _param_names = [
@@ -39,6 +40,7 @@ const _param_types = [
 	TYPE_FLOAT,
 	TYPE_FLOAT,
 	TYPE_VECTOR3,
+	TYPE_FLOAT,
 	TYPE_FLOAT,
 	TYPE_FLOAT,
 	TYPE_FLOAT
@@ -64,6 +66,7 @@ class SceneObject:
 		params[PARAM_TRANSFORM] = Param.new(Transform3D())
 		params[PARAM_COLOR] = Param.new(Color(1,1,1))
 		params[PARAM_SMOOTHNESS] = Param.new(0.2)
+		params[PARAM_LAYER] = Param.new(0.1)
 
 		match shape:
 			SHAPE_SPHERE:

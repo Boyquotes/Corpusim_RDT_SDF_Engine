@@ -26,6 +26,12 @@ const SDFContainer = preload("./sdf_container.gd")
 		s = clamp(s, 0.0, 1.0)
 		smoothness = s # Useless but doing it anyways
 		_set_param(SDF.PARAM_SMOOTHNESS, s)
+		
+@export var layer:float = 0.1 :
+	get:
+		return _data.params[SDF.PARAM_LAYER].value
+	set(l):
+		_set_param(SDF.PARAM_LAYER, l)
 
 var _data : SDF.SceneObject
 var _container : SDFContainer

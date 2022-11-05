@@ -106,7 +106,7 @@ func _update_shader():
 	var code := _generate_shader_code(_objects, _shader_template, _cutaways)
 	set_shrink(shrink)
 	# This is for debugging
-	#_debug_dump_text_file("generated_shader.txt", code)
+	_debug_dump_text_file("generated_shader.txt", code)
 
 	shader.code = code
 	_shader_material.set_shader(shader)
@@ -260,7 +260,8 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 			var type = SDF.get_param_type(param_index)
 			var stype = _godot_type_to_shader_type(type)
 			uniforms += str("uniform ", stype, " ", param.uniform, ";\n")
-			fcount += _godot_type_to_fcount(type)
+			# for debug
+			#fcount += _godot_type_to_fcount(type)
 
 		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), " * vec4(p, shrink)).xyz")
 		var indent = "\t"
@@ -276,7 +277,7 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		
 		# placed cutaway
 		#var cut_code2 : String = str("get_sphere(p,vec3" , cutaways[0].location, ", ",  "2.)")
-		shape_code = str("max(-1.*",cut_code1,", ", shape_code,")");
+		shape_code = str("max(-1.*",cut_code1,"-.4*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
 		
 		match obj.operation:
 			SDF.OP_UNION:
@@ -298,7 +299,8 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 				assert(false)
 
 	# TODO Move this log in an editor utility
-	print("Fcount: ", fcount)
+	# for debug
+	#print("Fcount: ", fcount)
 
 	return str(
 		template.before_uniforms, 
