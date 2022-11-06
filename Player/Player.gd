@@ -16,6 +16,8 @@ const SHRINK_MAX := 5.0
 var shrink := SHRINK_MIN
 var shrink_target := shrink
 
+#@onready var pos_base_shrink : Vector3 = position
+
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
@@ -40,6 +42,7 @@ func _input(event):
 		self.rotate_y(event.relative.x * MOUSE_SENSITIVITY * -1)
 		
 
+
 		
 
 func _physics_process(_delta):
@@ -62,11 +65,16 @@ func _physics_process(_delta):
 	if Input.is_action_just_released("shrink_decrease"):
 		shrink_target = clampf(shrink_target-.15,SHRINK_MIN, SHRINK_MAX)
 		
-	var shrink_delta = abs(shrink_target-shrink)
-	if shrink_delta > .01:
-		shrink = move_toward(shrink, shrink_target, shrink_delta*.1)
+	var shrink_delta = shrink_target-shrink
+	if abs(shrink_delta) > .01:
+		shrink = move_toward(shrink, shrink_target, abs(shrink_delta)*.1)
 		sdf_container.set_shrink(shrink)
 		hierarch.set_shrink(shrink)
+		
+		# bad solution to moving probe for shrink
+		position += position*shrink_delta*.02
+		
+		
 		
 	if Input.is_action_pressed("ui_accept"):
 		velocity.y = speed
@@ -83,3 +91,4 @@ func _physics_process(_delta):
 		velocity.z = move_toward(velocity.z, 0, m)
 
 	move_and_slide()
+	
