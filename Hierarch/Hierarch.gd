@@ -7,7 +7,7 @@ var shrink : float = 1.0
 var SDFCylinder := load("res://addons/sdf_rdt/sdf_cylinder.gd")
 var cylinder = SDFCylinder.new() 
 
-var shrinkpop := 4.5
+var shrinkpop := 3.0
 
 
 # Called when the node enters the scene tree for the first time.

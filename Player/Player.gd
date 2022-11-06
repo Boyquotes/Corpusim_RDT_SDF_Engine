@@ -21,6 +21,7 @@ var shrink_target := shrink
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	hud.get_node("msg").text = "Shrink: %0.3f" % shrink 
 
 func _process(_delta):
 	process_input()
@@ -71,7 +72,7 @@ func _physics_process(_delta):
 		shrink = move_toward(shrink, shrink_target, abs(shrink_delta)*.1)
 		sdf_container.set_shrink(shrink)
 		hierarch.set_shrink(shrink)
-		hud.get_node("msg").text = "Shrink: " + str(shrink)
+		hud.get_node("msg").text = "Shrink: %0.3f" % shrink 
 		
 		# bad solution to moving probe for shrink
 		position += position*shrink_delta*.02

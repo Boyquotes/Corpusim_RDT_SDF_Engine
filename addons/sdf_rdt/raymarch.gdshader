@@ -1,5 +1,7 @@
 shader_type spatial;
 //render_mode unshaded;//, depth_draw_opaque;
+render_mode depth_draw_never;
+
 
 //<uniforms>
 //</uniforms>
@@ -10,6 +12,7 @@ const int MAX_STEPS = 64;
 const float MAX_DISTANCE = 100.0;
 const float SURFACE_DISTANCE = 0.005;
 const float NORMAL_PRECISION = 0.0005;
+
 
 void vertex() {
 	POSITION = vec4(VERTEX, 1.0);
