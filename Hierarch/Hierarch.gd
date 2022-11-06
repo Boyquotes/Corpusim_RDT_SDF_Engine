@@ -7,6 +7,7 @@ var shrink : float = 1.0
 var SDFCylinder := load("res://addons/sdf_rdt/sdf_cylinder.gd")
 var cylinder = SDFCylinder.new() 
 
+var shrinkpop := 4.5
 
 
 # Called when the node enters the scene tree for the first time.
@@ -23,12 +24,12 @@ func _process(delta):
 	pass
 
 func _test_shrink():
-	if shrink > 3.0 && !sdf_container.is_ancestor_of(cylinder):
+	if shrink > shrinkpop && !sdf_container.is_ancestor_of(cylinder):
 		sdf_container.add_child(cylinder)
-		sdf_container.set_shrink(3.0)
-	elif shrink < 3.0 && sdf_container.is_ancestor_of(cylinder):
+		#sdf_container.set_shrink(shrinkpop)
+	elif shrink < shrinkpop && sdf_container.is_ancestor_of(cylinder):
 		sdf_container.remove_child(cylinder)
-		sdf_container.set_shrink(3.0)
+		#sdf_container.set_shrink(shrinkpop)
 
 func set_shrink(shrink_val):
 	shrink = shrink_val

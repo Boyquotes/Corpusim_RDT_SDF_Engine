@@ -10,6 +10,7 @@ var speed := MAX_SPEED
 
 @onready var sdf_container = $"%SDFContainer"
 @onready var hierarch = $"%Hierarch"
+@onready var hud = $"../HUD"
 
 const SHRINK_MIN := 1.0
 const SHRINK_MAX := 5.0
@@ -70,6 +71,7 @@ func _physics_process(_delta):
 		shrink = move_toward(shrink, shrink_target, abs(shrink_delta)*.1)
 		sdf_container.set_shrink(shrink)
 		hierarch.set_shrink(shrink)
+		hud.get_node("msg").text = "Shrink: " + str(shrink)
 		
 		# bad solution to moving probe for shrink
 		position += position*shrink_delta*.02

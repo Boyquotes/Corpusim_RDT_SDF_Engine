@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://d1ghg8r3bpboh"]
+[gd_scene load_steps=14 format=3 uid="uid://d1ghg8r3bpboh"]
 
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_container.gd" id="1_4lvc6"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_box.gd" id="2_4f4q8"]
@@ -6,8 +6,9 @@
 [ext_resource type="PackedScene" uid="uid://bdm56ujj65teb" path="res://Player/Player.tscn" id="4_o2jjx"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_torus.gd" id="5_ev7mj"]
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="6_eayxi"]
+[ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="7_tv8if"]
 
-[sub_resource type="Shader" id="Shader_v8p0t"]
+[sub_resource type="Shader" id="Shader_dtrv5"]
 code = "shader_type spatial;
 //render_mode unshaded;//, depth_draw_opaque;
 
@@ -129,11 +130,11 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	vec4 s = vec4(1.0, 1.0, 1.0, 99999.0);
 	
 	
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape0_layer, get_rounded_box((u_shape0_transform * vec4(p, shrink)).xyz, u_shape0_size * shrink , u_shape0_rounding)), s.rgb, u_shape0_color.rgb, u_shape0_smoothness);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape1_layer, get_rounded_box((u_shape1_transform * vec4(p, shrink)).xyz, u_shape1_size * shrink , u_shape1_rounding)), s.rgb, u_shape1_color.rgb, u_shape1_smoothness);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape2_layer, get_sphere((u_shape2_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape2_radius * shrink)), s.rgb, u_shape2_color.rgb, u_shape2_smoothness);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape3_layer, get_rounded_box((u_shape3_transform * vec4(p, shrink)).xyz, u_shape3_size * shrink , u_shape3_rounding)), s.rgb, u_shape3_color.rgb, u_shape3_smoothness);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape4_layer, get_torus((u_shape4_transform * vec4(p, shrink)).xyz, vec2(u_shape4_radius, u_shape4_thickness))), s.rgb, u_shape4_color.rgb, u_shape4_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape0_layer, get_rounded_box((u_shape0_transform * vec4(p, shrink)).xyz, u_shape0_size * shrink , u_shape0_rounding)+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(TIME*4.+p.x*20./shrink) )), s.rgb, u_shape0_color.rgb, u_shape0_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape1_layer, get_rounded_box((u_shape1_transform * vec4(p, shrink)).xyz, u_shape1_size * shrink , u_shape1_rounding)+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(TIME*4.+p.x*20./shrink) )), s.rgb, u_shape1_color.rgb, u_shape1_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape2_layer, get_sphere((u_shape2_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape2_radius * shrink)+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(TIME*4.+p.x*20./shrink) )), s.rgb, u_shape2_color.rgb, u_shape2_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape3_layer, get_rounded_box((u_shape3_transform * vec4(p, shrink)).xyz, u_shape3_size * shrink , u_shape3_rounding)+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(TIME*4.+p.x*20./shrink) )), s.rgb, u_shape3_color.rgb, u_shape3_smoothness);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.4*u_shape4_layer, get_torus((u_shape4_transform * vec4(p, shrink)).xyz, vec2(u_shape4_radius, u_shape4_thickness))+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(TIME*4.+p.x*20./shrink) )), s.rgb, u_shape4_color.rgb, u_shape4_smoothness);
 	
 	return s;
 }
@@ -204,9 +205,9 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_jxp8t"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ic4gm"]
 render_priority = 0
-shader = SubResource("Shader_v8p0t")
+shader = SubResource("Shader_dtrv5")
 shader_parameter/u_shape4_transform = Transform3D(0.409923, -0.91212, 0, 0.912119, 0.409923, 0, 0, 0, 1, 0.520795, -0.234054, 0)
 shader_parameter/u_shape4_thickness = 0.505737
 shader_parameter/u_shape4_smoothness = 0.2
@@ -238,7 +239,7 @@ shader_parameter/u_shape0_layer = 0.0
 shader_parameter/u_shape0_color = Color(0, 0.203922, 1, 1)
 shader_parameter/shrink = 1.0
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_14ul4"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_tfq86"]
 flip_faces = true
 orientation = 2
 
@@ -264,9 +265,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
-material_override = SubResource("ShaderMaterial_jxp8t")
+material_override = SubResource("ShaderMaterial_ic4gm")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_14ul4")
+mesh = SubResource("PlaneMesh_tfq86")
 script = ExtResource("1_4lvc6")
 
 [node name="SDFBox" type="Node3D" parent="SDFContainer"]
@@ -320,3 +321,5 @@ environment = SubResource("Environment_gslwi")
 
 [node name="Hierarch" parent="." instance=ExtResource("6_eayxi")]
 unique_name_in_owner = true
+
+[node name="HUD" parent="." instance=ExtResource("7_tv8if")]

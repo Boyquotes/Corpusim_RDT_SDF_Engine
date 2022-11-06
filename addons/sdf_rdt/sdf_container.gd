@@ -266,7 +266,12 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), " * vec4(p, shrink)).xyz")
 		var indent = "\t"
 		
-		var shape_code : String = _get_shape_code(obj, pos_code)
+		#var displace_code : String = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(TIME*4.+p.x*20./shrink)+shrink*.015*cos(TIME*12.+p.z*19./shrink) )"
+		var displace_code : String = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(time*4.+p.x*20./shrink)+shrink*.015*cos(time*12.+p.z*19./shrink) )"
+		#var displace_code = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(time*4.+p.x*20./shrink) )"
+		#var displace_code = "+ .1*sin(time)"
+		
+		var shape_code : String = _get_shape_code(obj, pos_code)+displace_code
 		
 		# cutaway tools applied. iterate through all cutaways
 		
