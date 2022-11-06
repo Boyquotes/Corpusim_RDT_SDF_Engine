@@ -213,8 +213,9 @@ static func _godot_type_to_fcount(type: int) -> int:
 static func _get_shape_code(obj, pos_code: String) -> String:
 	match obj.shape:
 		SDF.SHAPE_SPHERE:
+			var displace_code : String = "+ smoothstep(1.,5.,shrink)*( shrink* .02*sin(time*11.+p.x*20./shrink)+shrink*.015*cos(time*12.+p.z*19./shrink) )"
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
-				_get_param_code(obj, SDF.PARAM_RADIUS)," * shrink)")
+				_get_param_code(obj, SDF.PARAM_RADIUS)," * shrink)",displace_code)
 
 		SDF.SHAPE_BOX:
 			return str("get_rounded_box(", pos_code, 
@@ -267,11 +268,11 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var indent = "\t"
 		
 		#var displace_code : String = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(TIME*4.+p.x*20./shrink)+shrink*.015*cos(TIME*12.+p.z*19./shrink) )"
-		var displace_code : String = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(time*4.+p.x*20./shrink)+shrink*.015*cos(time*12.+p.z*19./shrink) )"
+		#var displace_code : String = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(time*4.+p.x*20./shrink)+shrink*.015*cos(time*12.+p.z*19./shrink) )"
 		#var displace_code = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(time*4.+p.x*20./shrink) )"
 		#var displace_code = "+ .1*sin(time)"
 		
-		var shape_code : String = _get_shape_code(obj, pos_code)+displace_code
+		var shape_code : String = _get_shape_code(obj, pos_code)#+displace_code
 		
 		# cutaway tools applied. iterate through all cutaways
 		
@@ -282,7 +283,7 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		
 		# placed cutaway
 		#var cut_code2 : String = str("get_sphere(p,vec3" , cutaways[0].location, ", ",  "2.)")
-		shape_code = str("max(-1.*",cut_code1,"-.4*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
+		shape_code = str("max(-1.*",cut_code1,"-.6*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
 		
 		match obj.operation:
 			SDF.OP_UNION:

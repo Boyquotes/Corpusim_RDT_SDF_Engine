@@ -15,6 +15,11 @@ run/main_scene="res://World.tscn"
 config/features=PackedStringArray("4.0", "Vulkan Clustered")
 config/icon="res://icon.svg"
 
+[display]
+
+window/dpi/allow_hidpi=false
+window/stretch/aspect="ignore"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/sdf_rdt/plugin.cfg")
@@ -75,3 +80,8 @@ shrink_decrease={
 "events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":16,"position":Vector2(496, 178),"global_position":Vector2(496, 178),"factor":1.0,"button_index":5,"pressed":true,"double_click":false,"script":null)
 ]
 }
+
+[rendering]
+
+anti_aliasing/screen_space_roughness_limiter/enabled=false
+anti_aliasing/quality/screen_space_aa=1
