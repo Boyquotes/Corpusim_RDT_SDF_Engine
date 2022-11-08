@@ -66,7 +66,7 @@ class SceneObject:
 		params[PARAM_TRANSFORM] = Param.new(Transform3D())
 		params[PARAM_COLOR] = Param.new(Color(1,1,1))
 		params[PARAM_SMOOTHNESS] = Param.new(0.2)
-		params[PARAM_LAYER] = Param.new(0.1)
+		params[PARAM_LAYER] = Param.new(1.0)
 
 		match shape:
 			SHAPE_SPHERE:
