@@ -289,18 +289,18 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 			SDF.OP_UNION:
 				scene += str(indent, "s = smooth_union_c(s.w, ", shape_code, ", s.rgb, ",
 					_get_param_code(obj, SDF.PARAM_COLOR), ".rgb, ", 
-					_get_param_code(obj, SDF.PARAM_SMOOTHNESS), ");\n")
+					_get_param_code(obj, SDF.PARAM_SMOOTHNESS), "*shrink);\n")
 
 			SDF.OP_SUBTRACT:
 				scene += str(indent, "s = smooth_subtract_c(s.w, ", shape_code, ", s.rgb, ",
 					#_get_param_code(obj, SDF.PARAM_COLOR), ".rgb, ", #transparent colors
 					"s.rgb+vec3(0,-0.1,-0.1),",
-					_get_param_code(obj, SDF.PARAM_SMOOTHNESS), ");\n")
+					_get_param_code(obj, SDF.PARAM_SMOOTHNESS), "*shrink);\n")
 
 			SDF.OP_COLOR:
 				scene += str(indent, "s.rgb = smooth_color(s.w, ", shape_code, ", s.rgb, ",
 					_get_param_code(obj, SDF.PARAM_COLOR), ".rgb, ", 
-					_get_param_code(obj, SDF.PARAM_SMOOTHNESS), ");\n")
+					_get_param_code(obj, SDF.PARAM_SMOOTHNESS), "*shrink);\n")
 			_:
 				assert(false)
 

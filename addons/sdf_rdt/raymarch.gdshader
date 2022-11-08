@@ -8,8 +8,8 @@ render_mode depth_draw_never;
 
 uniform float shrink = 1.0;
 
-const int MAX_STEPS = 64;
-const float MAX_DISTANCE = 100.0;
+const int MAX_STEPS = 128;
+const float MAX_DISTANCE = 200.0;
 const float SURFACE_DISTANCE = 0.005;
 const float NORMAL_PRECISION = 0.0005;
 

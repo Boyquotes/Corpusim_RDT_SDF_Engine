@@ -15,3 +15,4 @@ shape = SubResource("SphereShape3D_iagg4")
 [node name="RotationHelper" type="Node3D" parent="."]
 
 [node name="Camera3d" type="Camera3D" parent="RotationHelper"]
+cull_mask = 1048543
