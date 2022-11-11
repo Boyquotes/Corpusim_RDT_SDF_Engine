@@ -1,6 +1,7 @@
 shader_type spatial;
-//render_mode unshaded;// depth_draw_never;//, depth_draw_never; depth_draw_opaque;
-render_mode depth_draw_opaque;
+//render_mode unshaded;// depth_draw_never; depth_draw_opaque;
+render_mode depth_draw_always;
+
 
 
 //<uniforms>
@@ -109,7 +110,7 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 
 vec3 get_normal(vec3 p, float time, vec3 world_cam_pos) {
 	float d = get_scene(p, time, world_cam_pos).w;
-	vec2 e = vec2(NORMAL_PRECISION, 0.0);
+	vec2 e = vec2(NORMAL_PRECISION*shrink, 0.0);
 	vec3 n = d - vec3(
 		get_scene(p - e.xyy, time, world_cam_pos).w,
 		get_scene(p - e.yxy, time, world_cam_pos).w,
@@ -127,7 +128,7 @@ vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, ve
 		rgb = scene_info.rgb;
 		float ds = scene_info.w;
 		d += ds;
-		if (d > MAX_DISTANCE * shrink || ds < SURFACE_DISTANCE) {
+		if (d > MAX_DISTANCE * shrink || ds < SURFACE_DISTANCE*shrink) {
 			break;
 		}
 	}

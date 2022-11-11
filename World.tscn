@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="6_eayxi"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="7_tv8if"]
 
-[sub_resource type="Shader" id="Shader_ve2gu"]
+[sub_resource type="Shader" id="Shader_37v6h"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never;//, depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -57,8 +57,8 @@ uniform float u_shape6_radius;
 
 uniform float shrink = 1.0;
 
-const int MAX_STEPS = 128;
-const float MAX_DISTANCE = 200.0;
+const int MAX_STEPS = 64;
+const float MAX_DISTANCE = 100.0;
 const float SURFACE_DISTANCE = 0.005;
 const float NORMAL_PRECISION = 0.0005;
 
@@ -146,11 +146,11 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	
 	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape0_layer, get_rounded_box((u_shape0_transform * vec4(p, shrink)).xyz, u_shape0_size * shrink , u_shape0_rounding)), s.rgb, u_shape0_color.rgb, u_shape0_smoothness*shrink);
 	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape1_layer, get_rounded_box((u_shape1_transform * vec4(p, shrink)).xyz, u_shape1_size * shrink , u_shape1_rounding)), s.rgb, u_shape1_color.rgb, u_shape1_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape2_layer, get_sphere((u_shape2_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape2_radius * shrink)+ smoothstep(1.,5.,shrink)*( shrink* .02*sin(time*11.+p.x*20./shrink)+shrink*.015*cos(time*12.+p.z*19./shrink) )), s.rgb, u_shape2_color.rgb, u_shape2_smoothness*shrink);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape2_layer, get_sphere((u_shape2_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape2_radius * shrink)+ .08*smoothstep(1.,5.,shrink) *( sin( time*11.+max(abs(p.x)*20./shrink,.001) ) + cos( time*8.+max(abs(p.z)*20./shrink,.001) ))), s.rgb, u_shape2_color.rgb, u_shape2_smoothness*shrink);
 	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape3_layer, get_rounded_box((u_shape3_transform * vec4(p, shrink)).xyz, u_shape3_size * shrink , u_shape3_rounding)), s.rgb, u_shape3_color.rgb, u_shape3_smoothness*shrink);
 	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape4_layer, get_rounded_box((u_shape4_transform * vec4(p, shrink)).xyz, u_shape4_size * shrink , u_shape4_rounding)), s.rgb, u_shape4_color.rgb, u_shape4_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape5_layer, get_torus((u_shape5_transform * vec4(p, shrink)).xyz, vec2(u_shape5_radius, u_shape5_thickness))), s.rgb, u_shape5_color.rgb, u_shape5_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape6_layer, get_sphere((u_shape6_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape6_radius * shrink)+ smoothstep(1.,5.,shrink)*( shrink* .02*sin(time*11.+p.x*20./shrink)+shrink*.015*cos(time*12.+p.z*19./shrink) )), s.rgb, u_shape6_color.rgb, u_shape6_smoothness*shrink);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape5_layer, get_torus((u_shape5_transform * vec4(p, shrink)).xyz, vec2(u_shape5_radius*shrink, u_shape5_thickness*shrink))), s.rgb, u_shape5_color.rgb, u_shape5_smoothness*shrink);
+	s = smooth_union_c(s.w, max(-1.*get_sphere(p,world_cam_pos,3.5)-.6*u_shape6_layer, get_sphere((u_shape6_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape6_radius * shrink)+ .08*smoothstep(1.,5.,shrink) *( sin( time*11.+max(abs(p.x)*20./shrink,.001) ) + cos( time*8.+max(abs(p.z)*20./shrink,.001) ))), s.rgb, u_shape6_color.rgb, u_shape6_smoothness*shrink);
 	
 	return s;
 }
@@ -175,7 +175,7 @@ vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, ve
 		rgb = scene_info.rgb;
 		float ds = scene_info.w;
 		d += ds;
-		if (d > MAX_DISTANCE || ds < SURFACE_DISTANCE) {
+		if (d > MAX_DISTANCE * shrink || ds < SURFACE_DISTANCE) {
 			break;
 		}
 	}
@@ -204,20 +204,20 @@ void fragment() {
 	vec4 rm = raymarch(ray_origin, ray_dir, normal, time, world_cam_pos);
 	float d = rm.w;
 	
-	if (d > MAX_DISTANCE) {
+	if (d > MAX_DISTANCE * shrink) {
 		discard;
 	}
 	
-	// normalized device coordinates
 	vec4 sdf_ndc = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ray_origin + ray_dir * d, 1.0);
 	DEPTH = (sdf_ndc.z / sdf_ndc.w) * 0.5 + 0.5;
-	
+	//DEPTH = clamp(d*.02,0.,1.);
 	
 	
 	NORMAL = (VIEW_MATRIX * vec4(normal, 0.0)).xyz;
 	
 	//ALBEDO = ray_dir * 0.1;
 	ALBEDO = rm.rgb;
+	//ALBEDO = vec3(depth);
 	//ALBEDO = normal;
 	/*if(d > 0.0) {
 		ALBEDO = vec3(0.0, 1.0, 0.0);
@@ -226,9 +226,9 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_y6kki"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mwgjd"]
 render_priority = 0
-shader = SubResource("Shader_ve2gu")
+shader = SubResource("Shader_37v6h")
 shader_parameter/u_shape3_rounding = 0.0
 shader_parameter/u_shape3_size = Vector3(1, 1, 1)
 shader_parameter/u_shape3_smoothness = 0.2
@@ -271,7 +271,7 @@ shader_parameter/u_shape2_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.
 shader_parameter/u_shape3_color = Color(1, 1, 1, 1)
 shader_parameter/u_shape3_layer = 0.0
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_ncna3"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_6h2li"]
 flip_faces = true
 orientation = 2
 
@@ -306,9 +306,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_y6kki")
+material_override = SubResource("ShaderMaterial_mwgjd")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_ncna3")
+mesh = SubResource("PlaneMesh_6h2li")
 script = ExtResource("1_4lvc6")
 
 [node name="big blue" type="Node3D" parent="SDFContainer"]

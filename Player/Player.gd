@@ -11,17 +11,13 @@ var speed := MAX_SPEED
 @onready var sdf_container = $"%SDFContainer"
 @onready var hierarch = $"%Hierarch"
 @onready var hud = $"../HUD"
-@onready var camera : Camera3D = $"RotationHelper/Camera3d"
 
 const SHRINK_MIN := 1.0
-const SHRINK_MAX := 5.0
+const SHRINK_MAX := 50.0
 var shrink := SHRINK_MIN
 var shrink_target := shrink
 
 var shrink1_pos := Vector3()
-var shrink1_fov := 75.0
-
-#@onready var pos_base_shrink : Vector3 = position
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -69,9 +65,9 @@ func _physics_process(_delta):
 			speed = MAX_SPEED
 			
 	if Input.is_action_just_released("shrink_increase"):
-		shrink_target = clampf(shrink_target+.15,SHRINK_MIN, SHRINK_MAX)
+		shrink_target = clampf(shrink_target+.55,SHRINK_MIN, SHRINK_MAX)
 	if Input.is_action_just_released("shrink_decrease"):
-		shrink_target = clampf(shrink_target-.15,SHRINK_MIN, SHRINK_MAX)
+		shrink_target = clampf(shrink_target-.55,SHRINK_MIN, SHRINK_MAX)
 		
 	var shrink_delta = shrink_target-shrink
 	if abs(shrink_delta) > .01:
@@ -79,9 +75,6 @@ func _physics_process(_delta):
 		sdf_container.set_shrink(shrink)
 		hierarch.set_shrink(shrink)
 		hud.get_node("msg").text = "Shrink: %0.3f" % shrink 
-		camera.fov = shrink1_fov + shrink*-8.0
-		# bad solution to moving probe for shrink
-		#position += position*shrink_delta*.02
 		position = shrink1_pos*shrink
 		
 		

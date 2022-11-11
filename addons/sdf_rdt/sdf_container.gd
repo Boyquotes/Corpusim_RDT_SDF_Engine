@@ -213,7 +213,6 @@ static func _godot_type_to_fcount(type: int) -> int:
 static func _get_shape_code(obj, pos_code: String) -> String:
 	match obj.shape:
 		SDF.SHAPE_SPHERE:
-			#var displace_code : String = "+ smoothstep(1.,5.,shrink)*( shrink* .02*sin(time*11.+p.x*20./shrink)+shrink*.015*cos(time*12.+p.z*19./shrink) )"
 			var displace_code = "+ .08*smoothstep(1.,5.,shrink) *( sin( time*11.+max(abs(p.x)*20./shrink,.001) ) + cos( time*8.+max(abs(p.z)*20./shrink,.001) ))"
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
 				_get_param_code(obj, SDF.PARAM_RADIUS)," * shrink)",displace_code)
