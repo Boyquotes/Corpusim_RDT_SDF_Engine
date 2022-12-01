@@ -129,7 +129,10 @@ func _update_objects_from_children():
 	for child_index in get_child_count():
 		var child = get_child(child_index)
 		if child is SDFItem:
-			_objects.append(child.get_sdf_scene_object())
+			if child.operation == SDF.OP_CUTAWAY:
+				pass
+			else:
+				_objects.append(child.get_sdf_scene_object())
 	_update_shader()
 
 
@@ -267,14 +270,10 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), " * vec4(p, shrink)).xyz")
 		var indent = "\t"
 		
-		#var displace_code : String = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(TIME*4.+p.x*20./shrink)+shrink*.015*cos(TIME*12.+p.z*19./shrink) )"
-		#var displace_code : String = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(time*4.+p.x*20./shrink)+shrink*.015*cos(time*12.+p.z*19./shrink) )"
-		#var displace_code = "+ smoothstep(2.,4.,shrink)*( shrink* .02*sin(time*4.+p.x*20./shrink) )"
-		#var displace_code = "+ .1*sin(time)"
 		
 		var shape_code : String = _get_shape_code(obj, pos_code)#+displace_code
 		
-		# cutaway tools applied. iterate through all cutaways
+		# iterate through all cutaways
 		
 		#"get_sphere(", pos_code, ", vec3(0.0), ", _get_param_code(obj, SDF.PARAM_RADIUS), ")"
 		
@@ -282,7 +281,6 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var cut_code1 : String = str("get_sphere(p,world_cam_pos,", "3.5)")
 		
 		# placed cutaway
-		#var cut_code2 : String = str("get_sphere(p,vec3" , cutaways[0].location, ", ",  "2.)")
 		shape_code = str("max(-1.*",cut_code1,"-.6*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
 		
 		match obj.operation:

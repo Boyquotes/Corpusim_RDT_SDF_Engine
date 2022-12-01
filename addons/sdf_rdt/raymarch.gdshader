@@ -1,6 +1,6 @@
 shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
-render_mode depth_draw_always;
+render_mode depth_draw_opaque;
 
 
 

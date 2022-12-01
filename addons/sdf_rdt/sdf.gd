@@ -10,6 +10,7 @@ const SHAPE_CYLINDER = 3
 const OP_UNION = 0
 const OP_SUBTRACT = 1
 const OP_COLOR = 2
+const OP_CUTAWAY = 3
 
 const PARAM_TRANSFORM = 0
 const PARAM_COLOR = 1

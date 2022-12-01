@@ -4,7 +4,7 @@ extends Node3D
 const SDF = preload("./sdf.gd")
 const SDFContainer = preload("./sdf_container.gd")
 
-@export_enum("Add", "Subtract", "Color") var operation :
+@export_enum("Add", "Subtract", "Color", "Cutaway") var operation :
 	get:
 		return _data.operation
 	set(op):
