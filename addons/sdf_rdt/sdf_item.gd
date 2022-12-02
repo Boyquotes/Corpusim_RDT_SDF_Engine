@@ -4,6 +4,9 @@ extends Node3D
 const SDF = preload("./sdf.gd")
 const SDFContainer = preload("./sdf_container.gd")
 
+@export var follows_probe : bool = false
+@onready var probe : CharacterBody3D = get_node("../../Player")
+
 @export_enum("Add", "Subtract", "Color", "Cutaway") var operation :
 	get:
 		return _data.operation
@@ -41,6 +44,11 @@ func _init():
 	set_notify_transform(true) 
 
 
+func _process(delta):
+	if follows_probe && probe:
+		set_position(probe.position / probe.shrink)
+		set_rotation(probe.rotation)
+		
 func _set_param(param_index: int, value):
 	var param : Variant = _data.params[param_index]
 	if _container != null:
@@ -90,7 +98,9 @@ func _notification(what: int):
 		
 		# TODO Visibility?
 
-
+func del_me():
+	queue_free()
+	
 func _get_configuration_warnings() -> PackedStringArray :
 	var msg : PackedStringArray = PackedStringArray()
 	if _container == null:

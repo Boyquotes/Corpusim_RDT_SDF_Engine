@@ -105,7 +105,7 @@ func _update_shader():
 	var code := _generate_shader_code(_objects, _shader_template, _cutaways)
 	set_shrink(shrink)
 	# This is for debugging
-	_debug_dump_text_file("generated_shader.txt", code)
+	#_debug_dump_text_file("generated_shader.txt", code)
 
 	shader.code = code
 	_shader_material.set_shader(shader)
@@ -255,7 +255,6 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 	var fcount := 0
 	
 	for cutaway_index in len(cutaways):
-		print("cutaway #", cutaway_index)
 		var cut = cutaways[cutaway_index]
 		for param_index in cut.params:
 			var param = cut.params[param_index]
@@ -267,7 +266,6 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 			#fcount += _godot_type_to_fcount(type)
 	
 	for object_index in len(objects):
-		print("obj #")
 		var obj = objects[object_index] 
 		#if not obj.active:
 		#	continue
@@ -289,19 +287,14 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var indent = "\t"
 		
 		var shape_code : String = _get_shape_code(obj, pos_code)#+displace_code
-	
-		# probe cutaway
-		var cut_code : String = str("get_sphere(p,world_cam_pos,", "3.5)")
-		shape_code = str("max(-1.*",cut_code,"-.6*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
 		
-		# placed cutaways
+		# Cutaways
 		for cutaway_index in len(cutaways):
 			var cut = cutaways[cutaway_index]
 			
 			var cut_pos_code := str("(", _get_param_code(cut, SDF.PARAM_TRANSFORM), " * vec4(p, shrink)).xyz")
-			cut_code = _get_shape_code(cut, cut_pos_code)
+			var cut_code = _get_shape_code(cut, cut_pos_code)
 			
-			print(cut_code)
 			shape_code = str("max(-1.*",cut_code,"-.6*shrink*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
 		
 		match obj.operation:
