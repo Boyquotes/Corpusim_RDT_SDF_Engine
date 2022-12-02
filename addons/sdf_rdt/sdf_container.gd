@@ -23,13 +23,14 @@ class ShaderTemplate:
 
 
 var _objects : Array= []
+var _cutaways : Array= []
 var _next_id := 0
 var _shader_template : ShaderTemplate
 var _shader_material : ShaderMaterial
 var _need_shader_update := true
 var _need_objects_update := true
 
-var _cutaways:  Array = []
+
 var shrink : float = 1.0
 
 
@@ -41,12 +42,15 @@ func _ready():
 	pm.flip_faces = true
 	mesh = pm
 	
-	player = get_node("%Player")
-	var ca := Cutaway.new(player.position,4.0)
-	_cutaways.push_back(ca)
+	setup_player_cutaway()
 	
 	set_process(true)
 	_update_shader()
+	
+func setup_player_cutaway():
+	player = get_node("%Player")
+	var ca := Cutaway.new(player.position,4.0)
+	_cutaways.push_back(ca)
 	
 func set_shrink(shrink_val):
 	_shader_material.set_shader_parameter("shrink", shrink_val)
@@ -63,8 +67,12 @@ func set_object_param(so, param_index: int, value):
 
 func set_object_operation(so, op: int):
 	if so.operation != op:
+		var cutaway_toggled : bool = (SDF.OP_CUTAWAY == so.operation) || (op == SDF.OP_CUTAWAY)
 		so.operation = op
 		_schedule_shader_update()
+		if cutaway_toggled:
+			_update_objects_from_children()
+	
 
 
 func schedule_structural_update():
@@ -75,7 +83,6 @@ func schedule_structural_update():
 func _schedule_shader_update():
 	_need_shader_update = true
 	set_process(true)
-	print("will update shaeerder")
 
 
 func _process(delta):
@@ -126,11 +133,13 @@ func _update_material():
 
 func _update_objects_from_children():
 	_objects.clear()
+	_cutaways.clear()
+	setup_player_cutaway()
 	for child_index in get_child_count():
 		var child = get_child(child_index)
 		if child is SDFItem:
 			if child.operation == SDF.OP_CUTAWAY:
-				pass
+				_cutaways.append(child.get_sdf_scene_object())
 			else:
 				_objects.append(child.get_sdf_scene_object())
 	_update_shader()
@@ -247,7 +256,9 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 
 	var fcount := 0
 
-	
+	for cutaway_index in len(cutaways):
+		var cut = cutaways[cutaway_index]
+		print(cut,'  got one of ', len(cutaways))
 	
 	for object_index in len(objects):
 		var obj = objects[object_index] 
