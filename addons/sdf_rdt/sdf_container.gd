@@ -6,7 +6,6 @@ var SDFItem = load("res://addons/sdf_rdt/sdf_item.gd")
 
 const SHADER_PATH = "res://addons/sdf_rdt/raymarch.gdshader"
 
-var player : CharacterBody3D 
 
 class Cutaway:
 	var location := Vector3()
@@ -42,15 +41,10 @@ func _ready():
 	pm.flip_faces = true
 	mesh = pm
 	
-	setup_player_cutaway()
 	
 	set_process(true)
 	_update_shader()
 	
-func setup_player_cutaway():
-	player = get_node("%Player")
-	var ca := Cutaway.new(player.position,4.0)
-	_cutaways.push_back(ca)
 	
 func set_shrink(shrink_val):
 	_shader_material.set_shader_parameter("shrink", shrink_val)
@@ -107,8 +101,6 @@ func _update_shader():
 	# I want to reset all material params but Godot does not have an API for that,
 	# so I just create a new material
 	_shader_material = ShaderMaterial.new()
-
-	_cutaways[0].location = player.position
 	
 	var code := _generate_shader_code(_objects, _shader_template, _cutaways)
 	set_shrink(shrink)
@@ -129,12 +121,16 @@ func _update_material():
 			var param = obj.params[param_index]
 			if param.uniform != "":
 				_shader_material.set_shader_parameter(param.uniform, param.value)
+	for cut in _cutaways:
+		for param_index in cut.params:
+			var param = cut.params[param_index]
+			if param.uniform != "":
+				_shader_material.set_shader_parameter(param.uniform, param.value)
 
 
 func _update_objects_from_children():
 	_objects.clear()
 	_cutaways.clear()
-	setup_player_cutaway()
 	for child_index in get_child_count():
 		var child = get_child(child_index)
 		if child is SDFItem:
@@ -226,6 +222,7 @@ static func _get_shape_code(obj, pos_code: String) -> String:
 	match obj.shape:
 		SDF.SHAPE_SPHERE:
 			var displace_code = "+ .08*smoothstep(1.,5.,shrink) *( sin( time*11.+max(abs(p.x)*20./shrink,.001) ) + cos( time*8.+max(abs(p.z)*20./shrink,.001) ))"
+			displace_code = ""
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
 				_get_param_code(obj, SDF.PARAM_RADIUS)," * shrink)",displace_code)
 
@@ -252,15 +249,25 @@ static func _get_shape_code(obj, pos_code: String) -> String:
 static func _generate_shader_code(objects : Array, template: ShaderTemplate, cutaways :Array) -> String:
 	
 	var uniforms := ""
+	const cut_uf_offset := 1000
 	var scene := ""
 
 	var fcount := 0
-
+	
 	for cutaway_index in len(cutaways):
+		print("cutaway #", cutaway_index)
 		var cut = cutaways[cutaway_index]
-		print(cut,'  got one of ', len(cutaways))
+		for param_index in cut.params:
+			var param = cut.params[param_index]
+			param.uniform = _make_uniform_name(cutaway_index+cut_uf_offset, SDF.get_param_name(param_index))
+			var type = SDF.get_param_type(param_index)
+			var stype = _godot_type_to_shader_type(type)
+			uniforms += str("uniform ", stype, " ", param.uniform, ";\n")
+			# for debug
+			#fcount += _godot_type_to_fcount(type)
 	
 	for object_index in len(objects):
+		print("obj #")
 		var obj = objects[object_index] 
 		#if not obj.active:
 		#	continue
@@ -281,18 +288,21 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), " * vec4(p, shrink)).xyz")
 		var indent = "\t"
 		
-		
 		var shape_code : String = _get_shape_code(obj, pos_code)#+displace_code
-		
-		# iterate through all cutaways
-		
-		#"get_sphere(", pos_code, ", vec3(0.0), ", _get_param_code(obj, SDF.PARAM_RADIUS), ")"
-		
+	
 		# probe cutaway
-		var cut_code1 : String = str("get_sphere(p,world_cam_pos,", "3.5)")
+		var cut_code : String = str("get_sphere(p,world_cam_pos,", "3.5)")
+		shape_code = str("max(-1.*",cut_code,"-.6*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
 		
-		# placed cutaway
-		shape_code = str("max(-1.*",cut_code1,"-.6*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
+		# placed cutaways
+		for cutaway_index in len(cutaways):
+			var cut = cutaways[cutaway_index]
+			
+			var cut_pos_code := str("(", _get_param_code(cut, SDF.PARAM_TRANSFORM), " * vec4(p, shrink)).xyz")
+			cut_code = _get_shape_code(cut, cut_pos_code)
+			
+			print(cut_code)
+			shape_code = str("max(-1.*",cut_code,"-.6*shrink*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
 		
 		match obj.operation:
 			SDF.OP_UNION:
