@@ -4,7 +4,10 @@ extends Node3D
 const SDF = preload("./sdf.gd")
 const SDFContainer = preload("./sdf_container.gd")
 
-@export_enum("Add", "Subtract", "Color") var operation :
+var follows_probe : bool = false
+@onready var probe : CharacterBody3D = get_node("../../Player")
+
+@export_enum("Add", "Subtract", "Color", "Cutaway") var operation :
 	get:
 		return _data.operation
 	set(op):
@@ -26,6 +29,12 @@ const SDFContainer = preload("./sdf_container.gd")
 		s = clamp(s, 0.0, 1.0)
 		smoothness = s # Useless but doing it anyways
 		_set_param(SDF.PARAM_SMOOTHNESS, s)
+		
+@export var layer:float = 0.1 :
+	get:
+		return _data.params[SDF.PARAM_LAYER].value
+	set(l):
+		_set_param(SDF.PARAM_LAYER, l)
 
 var _data : SDF.SceneObject
 var _container : SDFContainer
@@ -35,6 +44,11 @@ func _init():
 	set_notify_transform(true) 
 
 
+func _process(delta):
+	if follows_probe && probe:
+		set_position(probe.position / probe.shrink)
+		set_rotation(probe.rotation)
+		
 func _set_param(param_index: int, value):
 	var param : Variant = _data.params[param_index]
 	if _container != null:
@@ -84,7 +98,9 @@ func _notification(what: int):
 		
 		# TODO Visibility?
 
-
+func del_me():
+	queue_free()
+	
 func _get_configuration_warnings() -> PackedStringArray :
 	var msg : PackedStringArray = PackedStringArray()
 	if _container == null:

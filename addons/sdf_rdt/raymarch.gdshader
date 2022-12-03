@@ -1,5 +1,8 @@
 shader_type spatial;
-//render_mode unshaded;//, depth_draw_opaque;
+//render_mode unshaded;// depth_draw_never; depth_draw_opaque;
+render_mode depth_draw_opaque;
+
+
 
 //<uniforms>
 //</uniforms>
@@ -10,6 +13,7 @@ const int MAX_STEPS = 64;
 const float MAX_DISTANCE = 100.0;
 const float SURFACE_DISTANCE = 0.005;
 const float NORMAL_PRECISION = 0.0005;
+
 
 void vertex() {
 	POSITION = vec4(VERTEX, 1.0);
@@ -106,7 +110,7 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 
 vec3 get_normal(vec3 p, float time, vec3 world_cam_pos) {
 	float d = get_scene(p, time, world_cam_pos).w;
-	vec2 e = vec2(NORMAL_PRECISION, 0.0);
+	vec2 e = vec2(NORMAL_PRECISION*shrink, 0.0);
 	vec3 n = d - vec3(
 		get_scene(p - e.xyy, time, world_cam_pos).w,
 		get_scene(p - e.yxy, time, world_cam_pos).w,
@@ -124,7 +128,7 @@ vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, ve
 		rgb = scene_info.rgb;
 		float ds = scene_info.w;
 		d += ds;
-		if (d > MAX_DISTANCE || ds < SURFACE_DISTANCE) {
+		if (d > MAX_DISTANCE * shrink || ds < SURFACE_DISTANCE) {
 			break;
 		}
 	}
@@ -146,22 +150,27 @@ void fragment() {
 	vec3 ray_origin = world_coords.xyz;
 	vec3 ray_dir = normalize(world_coords.xyz - world_cam_pos);
 	
-	float time = 0.0;
+	//float time = 0.0;
+	float time = float(TIME);
 	
 	vec3 normal;
 	vec4 rm = raymarch(ray_origin, ray_dir, normal, time, world_cam_pos);
 	float d = rm.w;
 	
-	if (d > MAX_DISTANCE) {
+	if (d > MAX_DISTANCE * shrink) {
 		discard;
 	}
 	
 	vec4 sdf_ndc = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ray_origin + ray_dir * d, 1.0);
 	DEPTH = (sdf_ndc.z / sdf_ndc.w) * 0.5 + 0.5;
+	//DEPTH = clamp(d*.02,0.,1.);
+	
+	
 	NORMAL = (VIEW_MATRIX * vec4(normal, 0.0)).xyz;
 	
 	//ALBEDO = ray_dir * 0.1;
 	ALBEDO = rm.rgb;
+	//ALBEDO = vec3(depth);
 	//ALBEDO = normal;
 	/*if(d > 0.0) {
 		ALBEDO = vec3(0.0, 1.0, 0.0);

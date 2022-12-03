@@ -10,6 +10,7 @@ const SHAPE_CYLINDER = 3
 const OP_UNION = 0
 const OP_SUBTRACT = 1
 const OP_COLOR = 2
+const OP_CUTAWAY = 3
 
 const PARAM_TRANSFORM = 0
 const PARAM_COLOR = 1
@@ -19,6 +20,7 @@ const PARAM_SIZE = 4
 const PARAM_THICKNESS = 5
 const PARAM_HEIGHT = 6
 const PARAM_ROUNDING = 7
+const PARAM_LAYER = 8
 
 
 const _param_names = [
@@ -39,6 +41,7 @@ const _param_types = [
 	TYPE_FLOAT,
 	TYPE_FLOAT,
 	TYPE_VECTOR3,
+	TYPE_FLOAT,
 	TYPE_FLOAT,
 	TYPE_FLOAT,
 	TYPE_FLOAT
@@ -64,6 +67,7 @@ class SceneObject:
 		params[PARAM_TRANSFORM] = Param.new(Transform3D())
 		params[PARAM_COLOR] = Param.new(Color(1,1,1))
 		params[PARAM_SMOOTHNESS] = Param.new(0.2)
+		params[PARAM_LAYER] = Param.new(1.0)
 
 		match shape:
 			SHAPE_SPHERE:

@@ -12,6 +12,5 @@ script = ExtResource("1_y4xwo")
 [node name="CollisionShape3d" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_iagg4")
 
-[node name="RotationHelper" type="Node3D" parent="."]
-
-[node name="Camera3d" type="Camera3D" parent="RotationHelper"]
+[node name="Camera3d" type="Camera3D" parent="."]
+cull_mask = 1048543

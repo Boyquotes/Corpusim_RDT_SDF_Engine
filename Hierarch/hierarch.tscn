@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bsi6feik85wmn"]
+
+[ext_resource type="Script" path="res://Hierarch/Hierarch.gd" id="1_cqk43"]
+
+[node name="Hierarch" type="Node"]
+script = ExtResource("1_cqk43")
