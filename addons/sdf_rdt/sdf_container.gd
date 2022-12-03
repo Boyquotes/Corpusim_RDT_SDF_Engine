@@ -4,6 +4,8 @@ extends MeshInstance3D
 const SDF = preload("./sdf.gd")
 var SDFItem = load("res://addons/sdf_rdt/sdf_item.gd")
 
+
+
 const SHADER_PATH = "res://addons/sdf_rdt/raymarch.gdshader"
 
 
@@ -218,17 +220,15 @@ static func _godot_type_to_fcount(type: int) -> int:
 	return 0
 
 
-static func _get_shape_code(obj, pos_code: String) -> String:
+static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> String:
 	match obj.shape:
 		SDF.SHAPE_SPHERE:
-			var displace_code = "+ .08*smoothstep(1.,5.,shrink) *( sin( time*11.+max(abs(p.x)*20./shrink,.001) ) + cos( time*8.+max(abs(p.z)*20./shrink,.001) ))"
-			displace_code = ""
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
-				_get_param_code(obj, SDF.PARAM_RADIUS)," * shrink)",displace_code)
+				_get_param_code(obj, SDF.PARAM_RADIUS-cut_layer*.1)," * shrink)")
 
 		SDF.SHAPE_BOX:
 			return str("get_rounded_box(", pos_code, 
-				", ", _get_param_code(obj, SDF.PARAM_SIZE), " * shrink ",
+				", ", _get_param_code(obj, SDF.PARAM_SIZE-cut_layer*.1), " * shrink ",
 				", ", _get_param_code(obj, SDF.PARAM_ROUNDING), ")")
 
 		SDF.SHAPE_TORUS:
@@ -292,10 +292,19 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		for cutaway_index in len(cutaways):
 			var cut = cutaways[cutaway_index]
 			
+			
 			var cut_pos_code := str("(", _get_param_code(cut, SDF.PARAM_TRANSFORM), " * vec4(p, shrink)).xyz")
+			
+			#cut
+			#if cut.shape == SDF.SHAPE_BOX:
+			#	cut.size -= .6*shrink*_get_param_code(obj,SDF.PARAM_LAYER)
+			#elif cut.shape == SDF.SHAPE_SPHERE:
+		#		cut.radius -= .6*shrink*_get_param_code(obj,SDF.PARAM_LAYER)
 			var cut_code = _get_shape_code(cut, cut_pos_code)
 			
-			shape_code = str("max(-1.*",cut_code,"-.6*shrink*",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
+			#shape_code = str("max(-1.*",cut_code,"- .6 * shrink * ",_get_param_code(obj, SDF.PARAM_LAYER), ", ", shape_code,")");
+			
+			shape_code = str("max(-1.*",cut_code,"- .6 * shrink * ",_get_param_code(obj, SDF.PARAM_LAYER), " * ", _get_param_code(cut, SDF.PARAM_LAYER), ",", shape_code,")");
 		
 		match obj.operation:
 			SDF.OP_UNION:

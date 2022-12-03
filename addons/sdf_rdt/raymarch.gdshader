@@ -128,7 +128,7 @@ vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, ve
 		rgb = scene_info.rgb;
 		float ds = scene_info.w;
 		d += ds;
-		if (d > MAX_DISTANCE * shrink || ds < SURFACE_DISTANCE*shrink) {
+		if (d > MAX_DISTANCE * shrink || ds < SURFACE_DISTANCE) {
 			break;
 		}
 	}

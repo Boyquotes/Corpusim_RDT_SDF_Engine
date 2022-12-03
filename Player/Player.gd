@@ -35,18 +35,15 @@ func _ready():
 	
 
 func _process(_delta):
-	process_input()
-	process_shrink()
+	_process_input()
+	_process_shrink()
 	if len(cutaways) == 0:
 		_place_cutaway(true)
-		if cutaway_type == "sphere":
-			cutaways[0].radius = cutaway_radius
-		else:
-			cutaways[0].size = cutaway_size
+
 
 
 		
-func process_input():
+func _process_input():
 	if Input.is_action_just_pressed("ui_cancel"):
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -71,25 +68,22 @@ func process_input():
 		inst.queue_free()
 		_place_cutaway(true)
 
-func process_shrink():
+func _process_shrink():
+	var shrink_speed : float = .55
 	if Input.is_action_just_released("shrink_increase"):
-		shrink_target = clampf(shrink_target+.55,SHRINK_MIN, SHRINK_MAX)
+		shrink_target = clampf(shrink_target+shrink_speed,SHRINK_MIN, SHRINK_MAX)
 	if Input.is_action_just_released("shrink_decrease"):
-		shrink_target = clampf(shrink_target-.55,SHRINK_MIN, SHRINK_MAX)
+		shrink_target = clampf(shrink_target-shrink_speed,SHRINK_MIN, SHRINK_MAX)
 		
 	var shrink_delta = shrink_target-shrink
 	if abs(shrink_delta) > .01:
 		shrink = move_toward(shrink, shrink_target, abs(shrink_delta)*.1)
-		if cutaway_type == "sphere":
-			cutaways[0].radius = cutaway_radius/shrink
-		else:
-			cutaways[0].size = cutaway_size/shrink
-		
+		_calibrate_cutaway_shrink()
 		sdf_container.set_shrink(shrink)
 		hierarch.set_shrink(shrink)
 		hud.get_node("msg").text = "Shrink: %0.3f" % shrink 
 		position = shrink1_pos*shrink			
-	
+
 func _input(event):
 	if event is InputEventMouseMotion && Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		rotate_object_local(Vector3(1,0,0),event.relative.y * MOUSE_SENSITIVITY * -1)
@@ -144,6 +138,16 @@ func _physics_process(_delta):
 	
 	shrink1_pos = position/shrink
 
+func _calibrate_cutaway_shrink():
+	if len(cutaways) > 0:
+		if cutaway_type == "sphere":
+			cutaways[0].radius = cutaway_radius/shrink
+			cutaways[0].layer = .1*cutaways[0].radius
+		elif cutaway_type == "box":
+			cutaways[0].size = cutaway_size/shrink
+			cutaways[0].layer = .2*cutaways[0].size.x
+
+
 # needs refactorings
 func _place_cutaway(follow_probe : bool = false):
 	var instance : sdf_item
@@ -152,12 +156,13 @@ func _place_cutaway(follow_probe : bool = false):
 	else:
 		instance = cutaway_box.new()
 	
-	
 	if follow_probe:
 		instance.follows_probe = true
 		cutaways.push_front(instance)
 	else:	
 		cutaways.push_back(instance)
+		
+	_calibrate_cutaway_shrink()
 		
 	instance.position = position/shrink
 	instance.rotation = rotation
@@ -165,8 +170,10 @@ func _place_cutaway(follow_probe : bool = false):
 		
 	if cutaway_type == "sphere":
 		instance.radius = cutaways[0].radius
+		instance.layer = cutaways[0].layer
 	else:
 		instance.size = cutaways[0].size
+		instance.layer = cutaways[0].layer
 		
 	instance.operation = SDF.OP_CUTAWAY
 	

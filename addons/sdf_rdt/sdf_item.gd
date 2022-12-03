@@ -4,7 +4,7 @@ extends Node3D
 const SDF = preload("./sdf.gd")
 const SDFContainer = preload("./sdf_container.gd")
 
-@export var follows_probe : bool = false
+var follows_probe : bool = false
 @onready var probe : CharacterBody3D = get_node("../../Player")
 
 @export_enum("Add", "Subtract", "Color", "Cutaway") var operation :
