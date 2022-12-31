@@ -109,7 +109,9 @@ func _update_shader():
 	# This is for debugging
 	#_debug_dump_text_file("generated_shader.txt", code)
 
-	shader.code = code
+	# this is the heaviest operation, 20x _generate_shader_code()
+	shader.code = code 
+	
 	_shader_material.set_shader(shader)
 	
 	set_material_override(_shader_material)
@@ -287,6 +289,9 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var indent = "\t"
 		
 		var shape_code : String = _get_shape_code(obj, pos_code)#+displace_code
+		
+		# onion everything
+		shape_code  = str("opOnion(", shape_code, ",.05 * shrink)")
 		
 		# Cutaways
 		for cutaway_index in len(cutaways):

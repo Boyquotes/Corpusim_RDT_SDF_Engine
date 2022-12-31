@@ -7,6 +7,7 @@ render_mode depth_draw_opaque;
 //<uniforms>
 //</uniforms>
 
+uniform vec3 fog_color : source_color = vec3(.005);
 uniform float shrink = 1.0;
 
 const int MAX_STEPS = 64;
@@ -89,6 +90,11 @@ vec3 repeat_domain(vec3 p, vec3 c, vec3 l) {
 	return p - c * clamp(round(p / c), -l, l);
 }
 
+float opOnion( in float sdf, in float thickness )
+{
+    return abs(sdf)-thickness;
+}
+
 //<functions>
 //</functions>
 
@@ -105,6 +111,7 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	s = smooth_subtract_c(s.w, get_sphere(p, vec3(0.3, 0.0, 1.5), 0.5), s.rgb, vec3(0.0, 1.0, 0.0), 0.1);
 	//</scene>
 	
+		
 	return s;
 }
 
@@ -169,7 +176,8 @@ void fragment() {
 	NORMAL = (VIEW_MATRIX * vec4(normal, 0.0)).xyz;
 	
 	//ALBEDO = ray_dir * 0.1;
-	ALBEDO = rm.rgb;
+	//ALBEDO = rm.rgb;
+	ALBEDO = mix(rm.rgb, fog_color, clamp(0.,1.,DEPTH * 100. - 99.));
 	//ALBEDO = vec3(depth);
 	//ALBEDO = normal;
 	/*if(d > 0.0) {

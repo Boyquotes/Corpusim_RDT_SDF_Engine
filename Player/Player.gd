@@ -15,6 +15,9 @@ const SHRINK_MAX : float = 50.0
 var shrink : float = SHRINK_MIN
 var shrink_target : float = shrink
 
+var velocity_roll : float = 0.
+var VELOCITY_ROLL_MAX : float = .03;
+
 var shrink1_pos : Vector3 = Vector3()
 
 const SDF = preload("res://addons/sdf_rdt/sdf.gd")
@@ -118,11 +121,16 @@ func _physics_process(_delta):
 			speed = MAX_SPEED
 			
 
-		
+	var r_delt = .002
 	if Input.is_action_pressed("Roll_Left"):
-		rotate_object_local(Vector3(0,0,1),20 * MOUSE_SENSITIVITY)
+		velocity_roll = move_toward(velocity_roll, VELOCITY_ROLL_MAX, r_delt)
+		rotate_object_local(Vector3(0,0,1),velocity_roll)
 	elif Input.is_action_pressed("Roll_Right"):
-		rotate_object_local(Vector3(0,0,1),20 * MOUSE_SENSITIVITY * -1)
+		velocity_roll = move_toward(velocity_roll, -VELOCITY_ROLL_MAX, r_delt)
+		rotate_object_local(Vector3(0,0,1),velocity_roll)
+	else:
+		velocity_roll = move_toward(velocity_roll, 0, r_delt*2)
+		rotate_object_local(Vector3(0,0,1),velocity_roll)
 		
 		
 	if direction:

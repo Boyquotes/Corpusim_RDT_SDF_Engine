@@ -1,14 +1,15 @@
-[gd_scene load_steps=15 format=3 uid="uid://d1ghg8r3bpboh"]
+[gd_scene load_steps=19 format=3 uid="uid://d1ghg8r3bpboh"]
 
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_container.gd" id="1_4lvc6"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_box.gd" id="2_4f4q8"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_sphere.gd" id="3_nom7a"]
+[ext_resource type="Script" path="res://addons/sdf_rdt/SDF_Manipulator.gd" id="4_1y0j4"]
 [ext_resource type="PackedScene" uid="uid://bdm56ujj65teb" path="res://Player/Player.tscn" id="4_o2jjx"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_torus.gd" id="5_ev7mj"]
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="6_eayxi"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="7_tv8if"]
 
-[sub_resource type="Shader" id="Shader_wnw8b"]
+[sub_resource type="Shader" id="Shader_60vjx"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -176,7 +177,7 @@ vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, ve
 		rgb = scene_info.rgb;
 		float ds = scene_info.w;
 		d += ds;
-		if (d > MAX_DISTANCE * shrink || ds < SURFACE_DISTANCE*shrink) {
+		if (d > MAX_DISTANCE * shrink || ds < SURFACE_DISTANCE) {
 			break;
 		}
 	}
@@ -227,9 +228,9 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_iiej1"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qwnbf"]
 render_priority = 0
-shader = SubResource("Shader_wnw8b")
+shader = SubResource("Shader_60vjx")
 shader_parameter/u_shape3_radius = 1.0
 shader_parameter/u_shape3_smoothness = 0.2
 shader_parameter/u_shape3_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0575, 0.673062, 2.83571)
@@ -272,23 +273,38 @@ shader_parameter/u_shape2_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.
 shader_parameter/u_shape3_color = Color(0.87451, 0.172549, 0.0666667, 1)
 shader_parameter/u_shape3_layer = 3.0
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_nprww"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_81jxj"]
 flip_faces = true
 orientation = 2
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_6jpg1"]
-sky_top_color = Color(0.160784, 0.678431, 1, 1)
-sky_curve = 0.504539
-ground_bottom_color = Color(0.0901961, 0.188235, 0.2, 1)
+[sub_resource type="Gradient" id="Gradient_bammc"]
+offsets = PackedFloat32Array(0.00172265, 0.586563)
+colors = PackedColorArray(0.00250211, 0.00390625, 0.00291499, 1, 0.200065, 0.157454, 0.222656, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_v3sa3"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_2irtd"]
+in_3d_space = true
+color_ramp = SubResource("Gradient_bammc")
+noise = SubResource("FastNoiseLite_v3sa3")
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_gsmeq"]
+panorama = SubResource("NoiseTexture2D_2irtd")
 
 [sub_resource type="Sky" id="Sky_us488"]
-sky_material = SubResource("ProceduralSkyMaterial_6jpg1")
+sky_material = SubResource("PanoramaSkyMaterial_gsmeq")
 process_mode = 3
 
 [sub_resource type="Environment" id="Environment_gslwi"]
 background_mode = 2
 background_color = Color(0.129412, 0.490196, 0.741176, 1)
 sky = SubResource("Sky_us488")
+fog_light_color = Color(0.160784, 0.14902, 0.180392, 1)
+fog_density = 0.0419
+fog_sky_affect = 0.968
+volumetric_fog_albedo = Color(0.290196, 0.290196, 0.290196, 1)
+volumetric_fog_length = 40.0
+volumetric_fog_sky_affect = 0.7
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_sdjvp"]
 dof_blur_far_enabled = true
@@ -307,9 +323,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_iiej1")
+material_override = SubResource("ShaderMaterial_qwnbf")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_nprww")
+mesh = SubResource("PlaneMesh_81jxj")
 script = ExtResource("1_4lvc6")
 
 [node name="big blue" type="Node3D" parent="SDFContainer"]
@@ -329,6 +345,10 @@ rounding = 0.0
 operation = 0
 color = Color(0.0431373, 1, 0.329412, 1)
 layer = 1.0
+
+[node name="SDF_Manip" type="Node" parent="SDFContainer/green plate"]
+script = ExtResource("4_1y0j4")
+spin_z = true
 
 [node name="Pinkball" type="Node3D" parent="SDFContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.87768, 0, -3.46965)
