@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="8_eob7v"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="9_7c4ph"]
 
-[sub_resource type="Shader" id="Shader_5hvcd"]
+[sub_resource type="Shader" id="Shader_dkqpo"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -237,9 +237,9 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ljh5q"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wtgin"]
 render_priority = 0
-shader = SubResource("Shader_5hvcd")
+shader = SubResource("Shader_dkqpo")
 shader_parameter/u_shape3_radius = 1.0
 shader_parameter/u_shape3_smoothness = 0.2
 shader_parameter/u_shape3_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0575, 0.673062, 2.83571)
@@ -283,18 +283,19 @@ shader_parameter/u_shape2_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.
 shader_parameter/u_shape3_color = Color(0.87451, 0.172549, 0.0666667, 1)
 shader_parameter/u_shape3_layer = 3.0
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_w8bbc"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_vnj3j"]
 flip_faces = true
 orientation = 2
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fkooi"]
 shader = ExtResource("7_liiw3")
-shader_parameter/colorA = Color(0.113725, 0.113725, 0.145098, 1)
-shader_parameter/colorB = Color(0.0352941, 0.0313726, 0.027451, 1)
-shader_parameter/patch_size = 0.126
-shader_parameter/patch_start = 0.482
-shader_parameter/scale = 2.0
-shader_parameter/speed = 1.1
+shader_parameter/colorA = Color(0.0196078, 0.203922, 0.207843, 1)
+shader_parameter/colorB = Color(0.0392157, 0.137255, 0.0313726, 1)
+shader_parameter/patch_size = 0.481
+shader_parameter/patch_start = 0.29
+shader_parameter/repetition = 20.0
+shader_parameter/seam_size = 0.352
+shader_parameter/speed = 0.845
 
 [sub_resource type="Sky" id="Sky_us488"]
 sky_material = SubResource("ShaderMaterial_fkooi")
@@ -328,9 +329,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_ljh5q")
+material_override = SubResource("ShaderMaterial_wtgin")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_w8bbc")
+mesh = SubResource("PlaneMesh_vnj3j")
 script = ExtResource("2_vw6ij")
 
 [node name="big blue" type="Node3D" parent="SDFContainer"]

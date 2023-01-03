@@ -9,13 +9,15 @@ vec3 mod289_3(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec2 mod289_2(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec3 permute(vec3 x) { return mod289_3(((x*34.0)+1.0)*x); }
 
-uniform float scale = 3.0;
+uniform float repetition = 5.0;
+uniform float seam_size : hint_range(0.0, 5.) = 0.;
 uniform float speed : hint_range(0.0, 2.) = 1.;
 uniform vec3 colorA : source_color = vec3(1.);
 uniform vec3 colorB : source_color = vec3(0.);
 
 uniform float patch_start : hint_range(0.05, 0.95);
 uniform float patch_size : hint_range(0.05,0.95);
+
 
 float snoise(vec2 v) {
     const vec4 C = vec4(0.211324865405187,  // (3.0-sqrt(3.0))/6.0
@@ -46,24 +48,18 @@ float snoise(vec2 v) {
     return 130.0 * dot(m, g);
 }
 
+vec2 sphereProject(vec2 q){
+	float phi = (2.*q.y-1.)*PI/2.;
+	return vec2((2.*q.x-1.)*cos(phi), q.y );
+}
+
 void sky() {
 	float time = TIME * speed;
 	
-    vec2 st = SKY_COORDS.xy*2.-1.;
-	
-	//TODO: remove seam in x uv
-	//st.x = mix(st.x, 0.,smoothstep(0.95*scale,1.*scale,st.x) ) ;
-	
-	st.x = st.x*clamp(smoothstep(1.,0.,abs(st.y)),0.,1.);
-	//st.y = st.y*clamp(smoothstep(1.,3., abs(2.*st.y-1.)),0.,1.);
-	float poleblend = smoothstep(.7,.4,abs(st.y));
-	st.y *= poleblend;
-	
-	st *= scale;
-	
+	vec2 st = sphereProject(SKY_COORDS.xy);
 	
     vec3 color = vec3(0.0);
-    vec2 pos = vec2(st*3.);
+    vec2 pos = vec2(st*repetition);
 
     float DF = 0.0;
 
@@ -77,8 +73,8 @@ void sky() {
     vel = vec2(cos(a),sin(a));
     DF += snoise(pos+vel)*.25+.25;
 
-	float d = smoothstep(patch_start,patch_start+patch_size,fract(DF));
+	float seam = seam_size*(smoothstep(0.86,1.,SKY_COORDS.x)+smoothstep(.14,0.,SKY_COORDS.x) );
+	float d = smoothstep(patch_start,patch_start+patch_size+seam,fract(DF));
     COLOR = vec3(colorA)*d  + vec3(colorB)*(1.-d);
-	//COLOR = vec3(dull);
-    
+	
 }
