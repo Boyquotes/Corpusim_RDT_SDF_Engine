@@ -6,6 +6,7 @@ const SHAPE_SPHERE = 0
 const SHAPE_BOX = 1
 const SHAPE_TORUS = 2
 const SHAPE_CYLINDER = 3
+const SHAPE_GENERIC = 4
 
 const OP_UNION = 0
 const OP_SUBTRACT = 1
@@ -21,6 +22,9 @@ const PARAM_THICKNESS = 5
 const PARAM_HEIGHT = 6
 const PARAM_ROUNDING = 7
 const PARAM_LAYER = 8
+const PARAM_SIZE_PRIMARY = 9
+const PARAM_SIZE_SECONDARY = 10
+const PARAM_GENERIC_SHAPE = 11
 
 
 const _param_names = [
@@ -32,7 +36,10 @@ const _param_names = [
 	"thickness",
 	"height",
 	"rounding",
-	"layer"
+	"layer",
+	"size_primary",
+	"size_secondary",
+	"generic_shape"
 ]
 
 const _param_types = [
@@ -44,7 +51,10 @@ const _param_types = [
 	TYPE_FLOAT,
 	TYPE_FLOAT,
 	TYPE_FLOAT,
-	TYPE_FLOAT
+	TYPE_FLOAT,
+	TYPE_FLOAT,
+	TYPE_FLOAT,
+	TYPE_INT
 ]
 
 class Param:
@@ -84,6 +94,12 @@ class SceneObject:
 			SHAPE_CYLINDER:
 				params[PARAM_RADIUS] = Param.new(0.5)
 				params[PARAM_HEIGHT] = Param.new(1.0)
+				params[PARAM_ROUNDING] = Param.new(0.0)
+				
+			SHAPE_GENERIC:
+				params[PARAM_SIZE_PRIMARY] = Param.new(3.0)
+				params[PARAM_SIZE_SECONDARY] = Param.new(3.0)
+				params[PARAM_GENERIC_SHAPE] = Param.new(2)
 				params[PARAM_ROUNDING] = Param.new(0.0)
 
 

@@ -6,6 +6,7 @@ const SDFBox = preload("../sdf_box.gd")
 const SDFSphere = preload("../sdf_sphere.gd")
 const SDFTorus = preload("../sdf_torus.gd")
 const SDFCylinder = preload("../sdf_cylinder.gd")
+const SDFGeneric = preload("../sdf_generic.gd")
 
 const SphereGizmo = preload("./sphere_gizmo.gd")
 const BoxGizmo = preload("./box_gizmo.gd")
@@ -30,6 +31,7 @@ func _enter_tree():
 	add_custom_type("SDFSphere", "Node3D", SDFSphere, _get_icon("sdf_sphere"))
 	add_custom_type("SDFTorus", "Node3D", SDFTorus, _get_icon("sdf_torus"))
 	add_custom_type("SDFCylinder", "Node3D", SDFCylinder, _get_icon("sdf_cylinder"))
+	add_custom_type("SDFGeneric", "Node3D", SDFGeneric, _get_icon("sdf_generic"))
 	
 	for gizmo_plugin in _gizmo_plugins:
 		gizmo_plugin.set_undo_redo(get_undo_redo())
@@ -43,6 +45,7 @@ func _exit_tree():
 	remove_custom_type("SDFSphere")
 	remove_custom_type("SDFTorus")
 	remove_custom_type("SDFCylinder")
+	remove_custom_type("SDFGeneric")
 
 	for gizmo_plugin in _gizmo_plugins:
 		remove_spatial_gizmo_plugin(gizmo_plugin)

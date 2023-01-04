@@ -21,10 +21,9 @@ var VELOCITY_ROLL_MAX : float = .03;
 var shrink1_pos : Vector3 = Vector3()
 
 const SDF = preload("res://addons/sdf_rdt/sdf.gd")
-const sdf_item = preload("res://addons/sdf_rdt/sdf_item.gd")
-var cutaway_sphere : = preload("res://addons/sdf_rdt/sdf_sphere.gd")
-var cutaway_box : = preload("res://addons/sdf_rdt/sdf_box.gd")
 var cutaway_type : String = "sphere"
+var cutaway_index = 1
+var cutaway_index_max = 1
 const cutaway_radius: float = 3.0
 const cutaway_size: Vector3 = Vector3(3,3,3)
 var cutaways : Array= []
@@ -34,16 +33,19 @@ func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	hud.get_node("msg").text = "Shrink: %0.3f" % shrink 
 	shrink1_pos = position
+	_init_cutaways()
 	_reset_cutaways()
+	
+
+func _init_cutaways():
+	pass	
+	
+		
 	
 
 func _process(_delta):
 	_process_input()
 	_process_shrink()
-	if len(cutaways) == 0:
-		_place_cutaway(true)
-
-
 
 		
 func _process_input():
@@ -66,10 +68,7 @@ func _process_input():
 			cutaway_type = "box"
 		else:
 			cutaway_type = "sphere"
-			
-		var inst = cutaways.pop_front()
-		inst.queue_free()
-		_place_cutaway(true)
+		
 
 func _process_shrink():
 	var shrink_speed : float = .55
@@ -147,8 +146,9 @@ func _physics_process(_delta):
 	shrink1_pos = position/shrink
 
 func _calibrate_cutaway_shrink():
+	cutaways[0].size = cutaways[0].size / shrink
 	if len(cutaways) > 0:
-		if cutaway_type == "sphere":
+		if false && cutaway_type == "sphere":
 			cutaways[0].radius = cutaway_radius/shrink
 			cutaways[0].layer = .1*cutaways[0].radius
 		elif cutaway_type == "box":
@@ -156,41 +156,37 @@ func _calibrate_cutaway_shrink():
 			cutaways[0].layer = .2*cutaways[0].size.x
 
 
-# needs refactorings
-func _place_cutaway(follow_probe : bool = false):
-	var instance : sdf_item
-	if cutaway_type == "sphere":
-		instance = cutaway_sphere.new()
-	else:
-		instance = cutaway_box.new()
+
+func _place_cutaway():
 	
-	if follow_probe:
-		instance.follows_probe = true
-		cutaways.push_front(instance)
-	else:	
-		cutaways.push_back(instance)
-		
-	_calibrate_cutaway_shrink()
-		
-	instance.position = position/shrink
-	instance.rotation = rotation
-	sdf_container.add_child(instance)
-		
-	if cutaway_type == "sphere":
-		instance.radius = cutaways[0].radius
-		instance.layer = cutaways[0].layer
+
+	
+	if cutaway_index < cutaway_index_max:
+		cutaways[cutaway_index].position = cutaways[0].position
+		cutaways[cutaway_index].size = cutaways[0].size
+		cutaway_index += 1
+		_calibrate_cutaway_shrink()
 	else:
-		instance.size = cutaways[0].size
-		instance.layer = cutaways[0].layer
+		print("Max Cutaways Placed. Right Mouse Button to Reset Cutaways.")
+	
+	if cutaway_type == "sphere":
+		pass
+	else:
+		pass
+	
+
 		
-	instance.operation = SDF.OP_CUTAWAY
+	
+	
 	
 
 func _reset_cutaways():
-	# clear cutaways
+	return
+	cutaways[0].size = 3.0
+	cutaways[0].position = position
 	for i in len(cutaways):
-		var inst : sdf_item = cutaways.pop_back()
-		inst.queue_free()
+		# size 0, position 0
+		pass
 		
 
 	

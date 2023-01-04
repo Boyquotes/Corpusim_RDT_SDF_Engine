@@ -9,12 +9,6 @@ var SDFItem = load("res://addons/sdf_rdt/sdf_item.gd")
 const SHADER_PATH = "res://addons/sdf_rdt/raymarch.gdshader"
 
 
-class Cutaway:
-	var location := Vector3()
-	var size : float = 4.0
-	func _init(l, s):
-		location = l
-		size = s
 	
 
 class ShaderTemplate:
@@ -69,7 +63,9 @@ func set_object_operation(so, op: int):
 		if cutaway_toggled:
 			_update_objects_from_children()
 	
-
+func set_object_shape(so, shape: int):
+	if so.shape != shape:
+		pass
 
 func schedule_structural_update():
 	_need_objects_update = true
@@ -203,6 +199,8 @@ static func _godot_type_to_shader_type(type: int):
 			return "mat4"
 		TYPE_VECTOR3:
 			return "vec3"
+		TYPE_INT:
+			return "int"
 		_:
 			assert(false)
 
@@ -243,6 +241,10 @@ static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> Stri
 				", ", _get_param_code(obj, SDF.PARAM_RADIUS),"* shrink", 
 				", ", _get_param_code(obj, SDF.PARAM_ROUNDING),
 				", ", _get_param_code(obj, SDF.PARAM_HEIGHT), "* shrink)")
+		# TODO: Replace with code for all shapes
+		SDF.SHAPE_GENERIC:
+			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
+				_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1)," * shrink)")
 		_:
 			assert(false)
 	return ""

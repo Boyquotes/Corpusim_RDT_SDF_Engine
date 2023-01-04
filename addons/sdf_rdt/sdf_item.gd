@@ -16,6 +16,9 @@ var follows_probe : bool = false
 			_container.set_object_operation(_data, op)
 		else:
 			_data.operation = op
+			
+
+			
 @export var color: Color = Color(1,1,1) :
 	get:
 		return _data.params[SDF.PARAM_COLOR].value
