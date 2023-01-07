@@ -2,8 +2,12 @@ extends Node
 
 @onready var manip : Node3D = get_parent()
 
-@export var spin_z : bool = false;
-@export var osc_z : bool = false;
+@export var spin_z : bool = false
+@export var osc_z : bool = false
+
+@export var MAX_OSC : float = 3.0
+
+@onready var start_pos : Vector3 = manip.position
 
 
 # Called when the node enters the scene tree for the first time.
@@ -17,5 +21,6 @@ func _process(delta):
 	if spin_z:
 		manip.rotate_object_local(Vector3(0,0,1),delta*.5)
 	if osc_z:
-		#manip.
-		pass
+		var offset = MAX_OSC * sin(.001*Time.get_ticks_msec())
+		manip.position = start_pos + Vector3(0,0,offset)
+		
