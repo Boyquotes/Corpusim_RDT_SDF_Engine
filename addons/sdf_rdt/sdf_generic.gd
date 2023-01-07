@@ -21,14 +21,14 @@ extends "./sdf_item.gd"
 		rounding = r # Useless but doing it anyways
 		_set_param(SDF.PARAM_ROUNDING, r)
 
-@export_enum("Sphere", "Box", "Cylinder", "Plane") var shape :
+@export_enum("Sphere", "Box", "Cylinder", "Plane") var g_shape :
 	get:
-		return _data.shape
+		return _get_param(SDF.PARAM_GENERIC_SHAPE)
 	set(s):
-		if _container != null:
-			_container.set_object_shape(_data, shape)
-		else:
-			_data.shape = shape
+		g_shape = s
+		_set_param(SDF.PARAM_GENERIC_SHAPE, s)
+			
+
 
 func _init():
 	_data = SDF.SceneObject.new(SDF.SHAPE_GENERIC)

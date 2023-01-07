@@ -26,6 +26,13 @@ const PARAM_SIZE_PRIMARY = 9
 const PARAM_SIZE_SECONDARY = 10
 const PARAM_GENERIC_SHAPE = 11
 
+const G_SPHERE = 0
+const G_BOX = 1
+const G_TORUS = 2
+const G_CYLINDER = 3
+const G_ROUNDCONE = 4
+
+
 
 const _param_names = [
 	"transform",
@@ -70,6 +77,8 @@ class SceneObject:
 	var shape := SHAPE_SPHERE
 	var params := {}
 	#var active := true
+	
+	var g_shape : int = 3
 
 	func _init(p_shape: int):
 		shape = p_shape
@@ -99,8 +108,8 @@ class SceneObject:
 			SHAPE_GENERIC:
 				params[PARAM_SIZE_PRIMARY] = Param.new(3.0)
 				params[PARAM_SIZE_SECONDARY] = Param.new(3.0)
-				params[PARAM_GENERIC_SHAPE] = Param.new(2)
-				params[PARAM_ROUNDING] = Param.new(0.0)
+				params[PARAM_GENERIC_SHAPE] = Param.new(1)
+				params[PARAM_ROUNDING] = Param.new(0.2)
 
 
 static func get_param_type(param_index: int) -> int:

@@ -98,11 +98,7 @@ func _notification(what: int):
 		
 		NOTIFICATION_TRANSFORM_CHANGED:
 			_set_param(SDF.PARAM_TRANSFORM, global_transform.affine_inverse())
-		
-		# TODO Visibility?
 
-func del_me():
-	queue_free()
 	
 func _get_configuration_warnings() -> PackedStringArray :
 	var msg : PackedStringArray = PackedStringArray()

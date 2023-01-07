@@ -63,9 +63,11 @@ func set_object_operation(so, op: int):
 		if cutaway_toggled:
 			_update_objects_from_children()
 	
-func set_object_shape(so, shape: int):
-	if so.shape != shape:
-		pass
+func set_object_shape(so, g_shape: int):
+	if so.g_shape != g_shape:
+		so.g_shape = g_shape
+		
+		
 
 func schedule_structural_update():
 	_need_objects_update = true
@@ -222,6 +224,16 @@ static func _godot_type_to_fcount(type: int) -> int:
 
 static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> String:
 	match obj.shape:
+		
+		# TODO: Replace with code for all shapes
+		SDF.SHAPE_GENERIC:
+			match(obj.params[SDF.PARAM_GENERIC_SHAPE].value):
+				SDF.G_SPHERE:
+					return str("get_sphere(", pos_code, ", vec3(0.0), ", 
+					_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1)," * shrink)")
+				_:
+					assert(false)
+					
 		SDF.SHAPE_SPHERE:
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
 				_get_param_code(obj, SDF.PARAM_RADIUS-cut_layer*.1)," * shrink)")
@@ -241,10 +253,7 @@ static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> Stri
 				", ", _get_param_code(obj, SDF.PARAM_RADIUS),"* shrink", 
 				", ", _get_param_code(obj, SDF.PARAM_ROUNDING),
 				", ", _get_param_code(obj, SDF.PARAM_HEIGHT), "* shrink)")
-		# TODO: Replace with code for all shapes
-		SDF.SHAPE_GENERIC:
-			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
-				_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1)," * shrink)")
+
 		_:
 			assert(false)
 	return ""
