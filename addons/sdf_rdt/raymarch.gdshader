@@ -15,10 +15,16 @@ const float MAX_DISTANCE = 100.0;
 const float SURFACE_DISTANCE = 0.005;
 const float NORMAL_PRECISION = 0.0005;
 
+const int SPHERE  = 0;
+const int ROUNDED_BOX = 1;
+const int CONE = 2;
+
 
 void vertex() {
 	POSITION = vec4(VERTEX, 1.0);
 }
+
+
 
 float get_sphere(vec3 p, vec3 center, float radius) {
 	return length(p - center) - radius;
@@ -42,6 +48,23 @@ float get_torus(vec3 p, vec2 r) {
 float get_rounded_cylinder(vec3 p, float radius, float rounding, float h) {
 	vec2 d = vec2(length(p.xz) - radius + rounding, abs(p.y) - h);
 	return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - rounding;
+}
+
+float get_generic_shape(int shape_sel, vec3 p, vec3 o, float rounding, float size1, float size2 ){
+	float d;
+	switch (shape_sel){
+		case SPHERE:
+		    d = get_sphere(p,o,size1);
+			break;
+		case ROUNDED_BOX:
+			d = get_rounded_box(p,vec3(size1),rounding);
+			break;
+		default:
+		    d = get_sphere(p,o,size1);
+			break;
+	}
+	
+	return d;
 }
 
 // Note: `union` is a reserved keyword but Godot doesn't seem to catch that

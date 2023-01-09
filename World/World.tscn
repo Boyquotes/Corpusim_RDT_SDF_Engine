@@ -11,7 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="8_eob7v"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="9_7c4ph"]
 
-[sub_resource type="Shader" id="Shader_62fvk"]
+[sub_resource type="Shader" id="Shader_0dgot"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -66,6 +66,14 @@ uniform float u_shape7_size_primary;
 uniform float u_shape7_size_secondary;
 uniform int u_shape7_generic_shape;
 uniform float u_shape7_rounding;
+uniform mat4 u_shape8_transform;
+uniform vec4 u_shape8_color;
+uniform float u_shape8_smoothness;
+uniform float u_shape8_layer;
+uniform float u_shape8_size_primary;
+uniform float u_shape8_size_secondary;
+uniform int u_shape8_generic_shape;
+uniform float u_shape8_rounding;
 
 uniform vec3 fog_color : source_color = vec3(.005);
 uniform float shrink = 1.0;
@@ -170,6 +178,7 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	s = smooth_union_c(s.w, opOnion(get_rounded_box((u_shape5_transform * vec4(p, shrink)).xyz, u_shape5_size * shrink , u_shape5_rounding),.05 * shrink), s.rgb, u_shape5_color.rgb, u_shape5_smoothness*shrink);
 	s = smooth_union_c(s.w, opOnion(get_torus((u_shape6_transform * vec4(p, shrink)).xyz, vec2(u_shape6_radius*shrink, u_shape6_thickness*shrink)),.05 * shrink), s.rgb, u_shape6_color.rgb, u_shape6_smoothness*shrink);
 	s = smooth_union_c(s.w, opOnion(get_sphere((u_shape7_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape7_size_primary * shrink),.05 * shrink), s.rgb, u_shape7_color.rgb, u_shape7_smoothness*shrink);
+	s = smooth_union_c(s.w, opOnion(get_rounded_box((u_shape8_transform * vec4(p, shrink)).xyz, vec3(u_shape8_size_primary) * shrink , u_shape8_rounding),.05 * shrink), s.rgb, u_shape8_color.rgb, u_shape8_smoothness*shrink);
 	
 		
 	return s;
@@ -247,18 +256,14 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_2ukyf"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_isd3w"]
 render_priority = 0
-shader = SubResource("Shader_62fvk")
-shader_parameter/u_shape4_layer = 0.0
-shader_parameter/u_shape4_rounding = 0.0
-shader_parameter/u_shape4_size = Vector3(1, 1, 1)
-shader_parameter/u_shape4_smoothness = 0.2
+shader = SubResource("Shader_0dgot")
 shader_parameter/u_shape4_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.73789, -0.517413, 2.03616)
 shader_parameter/u_shape5_color = Color(0.878431, 0.831373, 0.152941, 1)
 shader_parameter/u_shape5_layer = 1.0
 shader_parameter/u_shape5_rounding = 0.0
-shader_parameter/u_shape5_size = Vector3(2, 5, 3.98776)
+shader_parameter/u_shape5_size = Vector3(2.173, 5, 3.988)
 shader_parameter/u_shape5_smoothness = 0.2
 shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.06444, -4.4692, 27.2545)
 shader_parameter/u_shape6_color = Color(0.356863, 0.305882, 0.54902, 1)
@@ -275,6 +280,14 @@ shader_parameter/u_shape7_size_primary = 2.82
 shader_parameter/u_shape7_size_secondary = 1.051
 shader_parameter/u_shape7_smoothness = 0.2
 shader_parameter/u_shape7_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.82741, -0.0218525, 0.879131)
+shader_parameter/u_shape8_color = Color(1, 1, 1, 1)
+shader_parameter/u_shape8_generic_shape = 1
+shader_parameter/u_shape8_layer = 1.0
+shader_parameter/u_shape8_rounding = 0.284
+shader_parameter/u_shape8_size_primary = 2.269
+shader_parameter/u_shape8_size_secondary = 3.0
+shader_parameter/u_shape8_smoothness = 0.2
+shader_parameter/u_shape8_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
 shader_parameter/fog_color = null
 shader_parameter/shrink = 1.0
 shader_parameter/u_shape0_color = Color(0, 0.203922, 1, 1)
@@ -300,8 +313,12 @@ shader_parameter/u_shape3_radius = 1.0
 shader_parameter/u_shape3_smoothness = 0.2
 shader_parameter/u_shape3_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0575, 0.673062, 2.83571)
 shader_parameter/u_shape4_color = Color(1, 1, 1, 1)
+shader_parameter/u_shape4_layer = 0.0
+shader_parameter/u_shape4_rounding = 0.0
+shader_parameter/u_shape4_size = Vector3(1, 1, 1)
+shader_parameter/u_shape4_smoothness = 0.2
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_agfj5"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_gika7"]
 flip_faces = true
 orientation = 2
 
@@ -352,9 +369,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_2ukyf")
+material_override = SubResource("ShaderMaterial_isd3w")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_agfj5")
+mesh = SubResource("PlaneMesh_gika7")
 script = ExtResource("2_vw6ij")
 
 [node name="big blue" type="Node3D" parent="SDFContainer"]
@@ -406,7 +423,7 @@ layer = 0.0
 [node name="yellow cube" type="Node3D" parent="SDFContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.06449, 4.4632, -27.2528)
 script = ExtResource("3_bighi")
-size = Vector3(2, 5, 3.98776)
+size = Vector3(2.173, 5, 3.988)
 rounding = 0.0
 operation = 0
 color = Color(0.878431, 0.831373, 0.152941, 1)
@@ -430,6 +447,20 @@ rounding = 0.2
 g_shape = 0
 operation = 0
 color = Color(0.52549, 0.533333, 1, 1)
+layer = 1.0
+
+[node name="SDF_Manip2" type="Node" parent="SDFContainer/SDFGeneric"]
+script = ExtResource("4_0ln3o")
+osc_z = true
+MAX_OSC = 1.4
+
+[node name="SDFGeneric2" type="Node3D" parent="SDFContainer"]
+script = ExtResource("7_vvng6")
+size_primary = 2.269
+size_secondary = 3.0
+rounding = 0.284
+g_shape = 1
+operation = 0
 layer = 1.0
 
 [node name="DirectionalLight3d" type="DirectionalLight3D" parent="."]

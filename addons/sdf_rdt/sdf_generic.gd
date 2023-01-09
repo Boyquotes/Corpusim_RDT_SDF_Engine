@@ -27,8 +27,6 @@ extends "./sdf_item.gd"
 	set(s):
 		g_shape = s
 		_set_param(SDF.PARAM_GENERIC_SHAPE, s)
-			
-
 
 func _init():
 	_data = SDF.SceneObject.new(SDF.SHAPE_GENERIC)

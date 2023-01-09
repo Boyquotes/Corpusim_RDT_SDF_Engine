@@ -57,7 +57,7 @@ func set_object_param(so, param_index: int, value):
 
 func set_object_operation(so, op: int):
 	if so.operation != op:
-		var cutaway_toggled : bool = (SDF.OP_CUTAWAY == so.operation) || (op == SDF.OP_CUTAWAY)
+		var cutaway_toggled : bool = (so.operation == SDF.OP_CUTAWAY) || (op == SDF.OP_CUTAWAY)
 		so.operation = op
 		_schedule_shader_update()
 		if cutaway_toggled:
@@ -105,7 +105,7 @@ func _update_shader():
 	var code := _generate_shader_code(_objects, _shader_template, _cutaways)
 	set_shrink(shrink)
 	# This is for debugging
-	#_debug_dump_text_file("generated_shader.txt", code)
+	_debug_dump_text_file("generated_shader.txt", code)
 
 	# this is the heaviest operation, 20x _generate_shader_code()
 	shader.code = code 
@@ -225,14 +225,19 @@ static func _godot_type_to_fcount(type: int) -> int:
 static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> String:
 	match obj.shape:
 		
-		# TODO: Replace with code for all shapes
+		# TODO: write conditional in SHADER!
 		SDF.SHAPE_GENERIC:
 			match(obj.params[SDF.PARAM_GENERIC_SHAPE].value):
 				SDF.G_SPHERE:
 					return str("get_sphere(", pos_code, ", vec3(0.0), ", 
 					_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1)," * shrink)")
+				SDF.G_BOX:
+					return str("get_rounded_box(", pos_code, 
+					", ", "vec3(",_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1),")", " * shrink ",
+					", ", _get_param_code(obj, SDF.PARAM_ROUNDING), ")")
 				_:
-					assert(false)
+					return ""
+					#assert(false) #when all shapes are in code
 					
 		SDF.SHAPE_SPHERE:
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
@@ -262,7 +267,7 @@ static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> Stri
 static func _generate_shader_code(objects : Array, template: ShaderTemplate, cutaways :Array) -> String:
 	
 	var uniforms := ""
-	const cut_uf_offset := 1000
+	const cut_uf_offset := 1000 #avoid name collision
 	var scene := ""
 
 	var fcount := 0

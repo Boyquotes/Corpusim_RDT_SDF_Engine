@@ -78,7 +78,7 @@ class SceneObject:
 	var params := {}
 	#var active := true
 	
-	var g_shape : int = 3
+	var g_shape := G_SPHERE
 
 	func _init(p_shape: int):
 		shape = p_shape
