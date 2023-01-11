@@ -11,7 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="8_eob7v"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="9_7c4ph"]
 
-[sub_resource type="Shader" id="Shader_0dgot"]
+[sub_resource type="Shader" id="Shader_d4tuh"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -66,6 +66,7 @@ uniform float u_shape7_size_primary;
 uniform float u_shape7_size_secondary;
 uniform int u_shape7_generic_shape;
 uniform float u_shape7_rounding;
+uniform vec3 u_shape7_offset;
 uniform mat4 u_shape8_transform;
 uniform vec4 u_shape8_color;
 uniform float u_shape8_smoothness;
@@ -74,6 +75,7 @@ uniform float u_shape8_size_primary;
 uniform float u_shape8_size_secondary;
 uniform int u_shape8_generic_shape;
 uniform float u_shape8_rounding;
+uniform vec3 u_shape8_offset;
 
 uniform vec3 fog_color : source_color = vec3(.005);
 uniform float shrink = 1.0;
@@ -83,10 +85,21 @@ const float MAX_DISTANCE = 100.0;
 const float SURFACE_DISTANCE = 0.005;
 const float NORMAL_PRECISION = 0.0005;
 
+const int SPHERE  = 0;
+const int ROUNDED_BOX = 1;
+const int ROUNDED_CONE = 2;
+const int PLANE = 3;
+const int CYLINDER = 4;
+
 
 void vertex() {
 	POSITION = vec4(VERTEX, 1.0);
 }
+
+float dot2( in vec3 v ) {
+	 return dot(v,v); 
+}
+
 
 float get_sphere(vec3 p, vec3 center, float radius) {
 	return length(p - center) - radius;
@@ -112,7 +125,54 @@ float get_rounded_cylinder(vec3 p, float radius, float rounding, float h) {
 	return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - rounding;
 }
 
-// Note: `union` is a reserved keyword but Godot doesn't seem to catch that
+float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
+{
+  // sampling independent computations (only depend on shape)
+  vec3  ba = b - a;
+  float l2 = dot(ba,ba);
+  float rr = r1 - r2;
+  float a2 = l2 - rr*rr;
+  float il2 = 1.0/l2;
+    
+  // sampling dependant computations
+  vec3 pa = p - a;
+  float y = dot(pa,ba);
+  float z = y - l2;
+  float x2 = dot2( pa*l2 - ba*y );
+  float y2 = y*y*l2;
+  float z2 = z*z*l2;
+
+  // single square root!
+  float k = sign(rr)*rr*rr*x2;
+  if( sign(z)*a2*z2>k ) return  sqrt(x2 + z2)        *il2 - r2;
+  if( sign(y)*a2*y2<k ) return  sqrt(x2 + y2)        *il2 - r1;
+                        return (sqrt(x2*a2*il2)+y*rr)*il2 - r1;
+}
+
+float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2 ){
+	float d = 0.;
+	switch (shape_sel){
+		case SPHERE:
+		    d = get_sphere(p,offset,size1);
+			break;
+		case ROUNDED_BOX:
+			d = get_rounded_box(p,vec3(size1),rounding);
+			break;
+		case ROUNDED_CONE:
+			d = get_round_cone(p, vec3(0.0), offset,size1,size2);
+			break;
+			//float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
+		case CYLINDER:
+			d = get_rounded_cylinder(p, size1, rounding, size2);
+			break;
+		default:
+		    d = get_sphere(p,offset,size2);
+			break;
+	}
+	
+	return d;
+}
+
 float sharp_union(float a, float b) {
 	return min(a, b);
 }
@@ -177,8 +237,8 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	s = smooth_union_c(s.w, opOnion(get_rounded_box((u_shape4_transform * vec4(p, shrink)).xyz, u_shape4_size * shrink , u_shape4_rounding),.05 * shrink), s.rgb, u_shape4_color.rgb, u_shape4_smoothness*shrink);
 	s = smooth_union_c(s.w, opOnion(get_rounded_box((u_shape5_transform * vec4(p, shrink)).xyz, u_shape5_size * shrink , u_shape5_rounding),.05 * shrink), s.rgb, u_shape5_color.rgb, u_shape5_smoothness*shrink);
 	s = smooth_union_c(s.w, opOnion(get_torus((u_shape6_transform * vec4(p, shrink)).xyz, vec2(u_shape6_radius*shrink, u_shape6_thickness*shrink)),.05 * shrink), s.rgb, u_shape6_color.rgb, u_shape6_smoothness*shrink);
-	s = smooth_union_c(s.w, opOnion(get_sphere((u_shape7_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape7_size_primary * shrink),.05 * shrink), s.rgb, u_shape7_color.rgb, u_shape7_smoothness*shrink);
-	s = smooth_union_c(s.w, opOnion(get_rounded_box((u_shape8_transform * vec4(p, shrink)).xyz, vec3(u_shape8_size_primary) * shrink , u_shape8_rounding),.05 * shrink), s.rgb, u_shape8_color.rgb, u_shape8_smoothness*shrink);
+	s = smooth_union_c(s.w, opOnion(get_generic_shape(u_shape7_generic_shape,(u_shape7_transform * vec4(p, shrink)).xyz,u_shape7_offset,u_shape7_rounding,u_shape7_size_primary,u_shape7_size_secondary),.05 * shrink), s.rgb, u_shape7_color.rgb, u_shape7_smoothness*shrink);
+	s = smooth_union_c(s.w, opOnion(get_generic_shape(u_shape8_generic_shape,(u_shape8_transform * vec4(p, shrink)).xyz,u_shape8_offset,u_shape8_rounding,u_shape8_size_primary,u_shape8_size_secondary),.05 * shrink), s.rgb, u_shape8_color.rgb, u_shape8_smoothness*shrink);
 	
 		
 	return s;
@@ -256,10 +316,9 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_isd3w"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_butjy"]
 render_priority = 0
-shader = SubResource("Shader_0dgot")
-shader_parameter/u_shape4_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.73789, -0.517413, 2.03616)
+shader = SubResource("Shader_d4tuh")
 shader_parameter/u_shape5_color = Color(0.878431, 0.831373, 0.152941, 1)
 shader_parameter/u_shape5_layer = 1.0
 shader_parameter/u_shape5_rounding = 0.0
@@ -275,19 +334,21 @@ shader_parameter/u_shape6_transform = Transform3D(0.409923, -0.91212, 0, 0.91211
 shader_parameter/u_shape7_color = Color(0.52549, 0.533333, 1, 1)
 shader_parameter/u_shape7_generic_shape = 0
 shader_parameter/u_shape7_layer = 1.0
+shader_parameter/u_shape7_offset = Vector3(0.5, 0.5, 0.8)
 shader_parameter/u_shape7_rounding = 0.2
-shader_parameter/u_shape7_size_primary = 2.82
-shader_parameter/u_shape7_size_secondary = 1.051
+shader_parameter/u_shape7_size_primary = 1.949
+shader_parameter/u_shape7_size_secondary = 1.017
 shader_parameter/u_shape7_smoothness = 0.2
-shader_parameter/u_shape7_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.82741, -0.0218525, 0.879131)
-shader_parameter/u_shape8_color = Color(1, 1, 1, 1)
-shader_parameter/u_shape8_generic_shape = 1
+shader_parameter/u_shape7_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.74593, -0.0218525, 0.879131)
+shader_parameter/u_shape8_color = Color(1, 0.32549, 0.113725, 1)
+shader_parameter/u_shape8_generic_shape = 2
 shader_parameter/u_shape8_layer = 1.0
-shader_parameter/u_shape8_rounding = 0.284
-shader_parameter/u_shape8_size_primary = 2.269
-shader_parameter/u_shape8_size_secondary = 3.0
+shader_parameter/u_shape8_offset = Vector3(0.001, 2.383, 0)
+shader_parameter/u_shape8_rounding = 0.221
+shader_parameter/u_shape8_size_primary = 0.146
+shader_parameter/u_shape8_size_secondary = 0.458
 shader_parameter/u_shape8_smoothness = 0.2
-shader_parameter/u_shape8_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
+shader_parameter/u_shape8_transform = Transform3D(0.611237, -0.791448, 0, 0.791448, 0.611237, 0, 0, 0, 1, 1.24141, -0.729916, 0.00168514)
 shader_parameter/fog_color = null
 shader_parameter/shrink = 1.0
 shader_parameter/u_shape0_color = Color(0, 0.203922, 1, 1)
@@ -317,20 +378,20 @@ shader_parameter/u_shape4_layer = 0.0
 shader_parameter/u_shape4_rounding = 0.0
 shader_parameter/u_shape4_size = Vector3(1, 1, 1)
 shader_parameter/u_shape4_smoothness = 0.2
+shader_parameter/u_shape4_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.73789, -0.517413, 2.03616)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_gika7"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_yo4w7"]
 flip_faces = true
 orientation = 2
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fkooi"]
 shader = ExtResource("7_liiw3")
-shader_parameter/colorA = Color(0.0196078, 0.203922, 0.207843, 1)
-shader_parameter/colorB = Color(0.0392157, 0.137255, 0.0313726, 1)
-shader_parameter/patch_size = 0.538
-shader_parameter/patch_start = 0.499
-shader_parameter/repetition = 6.0
-shader_parameter/seam_size = 0.916
-shader_parameter/speed = 0.845
+shader_parameter/colorA = Color(0.498039, 0.294118, 0.239216, 1)
+shader_parameter/colorB = Color(0.129412, 0, 0.176471, 1)
+shader_parameter/patch_size = 0.47
+shader_parameter/patch_start = 0.408
+shader_parameter/repetition = 3.5
+shader_parameter/speed = 0.076
 
 [sub_resource type="Sky" id="Sky_us488"]
 sky_material = SubResource("ShaderMaterial_fkooi")
@@ -369,9 +430,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_isd3w")
+material_override = SubResource("ShaderMaterial_butjy")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_gika7")
+mesh = SubResource("PlaneMesh_yo4w7")
 script = ExtResource("2_vw6ij")
 
 [node name="big blue" type="Node3D" parent="SDFContainer"]
@@ -439,11 +500,12 @@ color = Color(0.356863, 0.305882, 0.54902, 1)
 layer = 2.0
 
 [node name="SDFGeneric" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.82746, 0.0158572, -0.877446)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.74598, 0.0158572, -0.877446)
 script = ExtResource("7_vvng6")
-size_primary = 2.82
-size_secondary = 1.051
+size_primary = 1.949
+size_secondary = 1.017
 rounding = 0.2
+offset = Vector3(0.5, 0.5, 0.8)
 g_shape = 0
 operation = 0
 color = Color(0.52549, 0.533333, 1, 1)
@@ -455,12 +517,15 @@ osc_z = true
 MAX_OSC = 1.4
 
 [node name="SDFGeneric2" type="Node3D" parent="SDFContainer"]
+transform = Transform3D(0.611237, 0.791448, 0, -0.791448, 0.611237, 0, 0, 0, 1, -0.181154, 1.42267, 0)
 script = ExtResource("7_vvng6")
-size_primary = 2.269
-size_secondary = 3.0
-rounding = 0.284
-g_shape = 1
+size_primary = 0.146
+size_secondary = 0.458
+rounding = 0.221
+offset = Vector3(0.001, 2.383, 0)
+g_shape = 2
 operation = 0
+color = Color(1, 0.32549, 0.113725, 1)
 layer = 1.0
 
 [node name="DirectionalLight3d" type="DirectionalLight3D" parent="."]

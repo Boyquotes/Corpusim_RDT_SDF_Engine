@@ -25,6 +25,7 @@ const PARAM_LAYER = 8
 const PARAM_SIZE_PRIMARY = 9
 const PARAM_SIZE_SECONDARY = 10
 const PARAM_GENERIC_SHAPE = 11
+const PARAM_OFFSET = 12
 
 const G_SPHERE = 0
 const G_BOX = 1
@@ -46,7 +47,8 @@ const _param_names = [
 	"layer",
 	"size_primary",
 	"size_secondary",
-	"generic_shape"
+	"generic_shape",
+	"offset"
 ]
 
 const _param_types = [
@@ -61,7 +63,8 @@ const _param_types = [
 	TYPE_FLOAT,
 	TYPE_FLOAT,
 	TYPE_FLOAT,
-	TYPE_INT
+	TYPE_INT,
+	TYPE_VECTOR3
 ]
 
 class Param:
@@ -89,6 +92,14 @@ class SceneObject:
 		params[PARAM_LAYER] = Param.new(1.0)
 
 		match shape:
+			
+			SHAPE_GENERIC:
+				params[PARAM_SIZE_PRIMARY] = Param.new(3.0)
+				params[PARAM_SIZE_SECONDARY] = Param.new(3.0)
+				params[PARAM_GENERIC_SHAPE] = Param.new(1)
+				params[PARAM_ROUNDING] = Param.new(0.2)
+				params[PARAM_OFFSET] = Param.new(Vector3(0,0,0))
+				
 			SHAPE_SPHERE:
 				params[PARAM_RADIUS] = Param.new(1.0)
 
@@ -105,11 +116,7 @@ class SceneObject:
 				params[PARAM_HEIGHT] = Param.new(1.0)
 				params[PARAM_ROUNDING] = Param.new(0.0)
 				
-			SHAPE_GENERIC:
-				params[PARAM_SIZE_PRIMARY] = Param.new(3.0)
-				params[PARAM_SIZE_SECONDARY] = Param.new(3.0)
-				params[PARAM_GENERIC_SHAPE] = Param.new(1)
-				params[PARAM_ROUNDING] = Param.new(0.2)
+
 
 
 static func get_param_type(param_index: int) -> int:

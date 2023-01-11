@@ -105,7 +105,7 @@ func _update_shader():
 	var code := _generate_shader_code(_objects, _shader_template, _cutaways)
 	set_shrink(shrink)
 	# This is for debugging
-	_debug_dump_text_file("generated_shader.txt", code)
+	#_debug_dump_text_file("generated_shader.txt", code)
 
 	# this is the heaviest operation, 20x _generate_shader_code()
 	shader.code = code 
@@ -227,17 +227,12 @@ static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> Stri
 		
 		# TODO: write conditional in SHADER!
 		SDF.SHAPE_GENERIC:
-			match(obj.params[SDF.PARAM_GENERIC_SHAPE].value):
-				SDF.G_SPHERE:
-					return str("get_sphere(", pos_code, ", vec3(0.0), ", 
-					_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1)," * shrink)")
-				SDF.G_BOX:
-					return str("get_rounded_box(", pos_code, 
-					", ", "vec3(",_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1),")", " * shrink ",
-					", ", _get_param_code(obj, SDF.PARAM_ROUNDING), ")")
-				_:
-					return ""
-					#assert(false) #when all shapes are in code
+			return str("get_generic_shape(",
+				_get_param_code(obj, SDF.PARAM_GENERIC_SHAPE),",",
+				pos_code, ",",_get_param_code(obj, SDF.PARAM_OFFSET), ",",
+				_get_param_code(obj, SDF.PARAM_ROUNDING),",",
+				_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1),",",
+				_get_param_code(obj, SDF.PARAM_SIZE_SECONDARY-cut_layer*.1),")")
 					
 		SDF.SHAPE_SPHERE:
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 

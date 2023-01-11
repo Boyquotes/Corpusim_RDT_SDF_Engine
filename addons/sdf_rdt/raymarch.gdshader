@@ -17,13 +17,18 @@ const float NORMAL_PRECISION = 0.0005;
 
 const int SPHERE  = 0;
 const int ROUNDED_BOX = 1;
-const int CONE = 2;
+const int ROUNDED_CONE = 2;
+const int PLANE = 3;
+const int CYLINDER = 4;
 
 
 void vertex() {
 	POSITION = vec4(VERTEX, 1.0);
 }
 
+float dot2( in vec3 v ) {
+	 return dot(v,v); 
+}
 
 
 float get_sphere(vec3 p, vec3 center, float radius) {
@@ -50,24 +55,54 @@ float get_rounded_cylinder(vec3 p, float radius, float rounding, float h) {
 	return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - rounding;
 }
 
-float get_generic_shape(int shape_sel, vec3 p, vec3 o, float rounding, float size1, float size2 ){
-	float d;
+float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
+{
+  // sampling independent computations (only depend on shape)
+  vec3  ba = b - a;
+  float l2 = dot(ba,ba);
+  float rr = r1 - r2;
+  float a2 = l2 - rr*rr;
+  float il2 = 1.0/l2;
+    
+  // sampling dependant computations
+  vec3 pa = p - a;
+  float y = dot(pa,ba);
+  float z = y - l2;
+  float x2 = dot2( pa*l2 - ba*y );
+  float y2 = y*y*l2;
+  float z2 = z*z*l2;
+
+  // single square root!
+  float k = sign(rr)*rr*rr*x2;
+  if( sign(z)*a2*z2>k ) return  sqrt(x2 + z2)        *il2 - r2;
+  if( sign(y)*a2*y2<k ) return  sqrt(x2 + y2)        *il2 - r1;
+                        return (sqrt(x2*a2*il2)+y*rr)*il2 - r1;
+}
+
+float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2 ){
+	float d = 0.;
 	switch (shape_sel){
 		case SPHERE:
-		    d = get_sphere(p,o,size1);
+		    d = get_sphere(p,offset,size1);
 			break;
 		case ROUNDED_BOX:
 			d = get_rounded_box(p,vec3(size1),rounding);
 			break;
+		case ROUNDED_CONE:
+			d = get_round_cone(p, vec3(0.0), offset,size1,size2);
+			break;
+			//float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
+		case CYLINDER:
+			d = get_rounded_cylinder(p, size1, rounding, size2);
+			break;
 		default:
-		    d = get_sphere(p,o,size1);
+		    d = get_sphere(p,offset,size2);
 			break;
 	}
 	
 	return d;
 }
 
-// Note: `union` is a reserved keyword but Godot doesn't seem to catch that
 float sharp_union(float a, float b) {
 	return min(a, b);
 }

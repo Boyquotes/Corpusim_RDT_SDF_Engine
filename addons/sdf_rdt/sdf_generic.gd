@@ -20,8 +20,17 @@ extends "./sdf_item.gd"
 	set(r):
 		rounding = r # Useless but doing it anyways
 		_set_param(SDF.PARAM_ROUNDING, r)
+		
 
-@export_enum("Sphere", "Box", "Cylinder", "Plane") var g_shape :
+@export var offset : Vector3 = Vector3(0,0,0) :
+	get:
+		return _data.params[SDF.PARAM_OFFSET].value
+	set(o):
+		offset = o # Useless but doing it anyways
+		_set_param(SDF.PARAM_OFFSET, o)
+
+
+@export_enum("Sphere", "Box", "Round Cone", "Plane", "Cylinder") var g_shape:int:
 	get:
 		return _get_param(SDF.PARAM_GENERIC_SHAPE)
 	set(s):
