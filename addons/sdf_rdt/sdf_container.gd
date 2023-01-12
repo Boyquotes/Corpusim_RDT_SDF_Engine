@@ -3,6 +3,7 @@ extends MeshInstance3D
 
 const SDF = preload("./sdf.gd")
 var SDFItem = load("res://addons/sdf_rdt/sdf_item.gd")
+var SDFGeneric = load("res://addons/sdf_rdt/sdf_generic.gd")
 
 
 
@@ -42,10 +43,19 @@ func _ready():
 	_update_shader()
 	
 	
-func set_shrink(shrink_val):
+func calibrate_shrink(shrink_val : float, normalized_size1 : float):
+	
+	
+	if _cutaways.size() > 0:
+		var new_size = normalized_size1 / shrink
+		_cutaways[0].params[SDF.PARAM_SIZE_PRIMARY].value = new_size
+		print("new size is ", new_size)
+		_cutaways[0].params[SDF.PARAM_LAYER].value = .1 * new_size
+		pass
+		
 	_shader_material.set_shader_parameter("shrink", shrink_val)
 	shrink = shrink_val
-
+		
 
 func set_object_param(so, param_index: int, value):
 	var param = so.params[param_index]
@@ -66,8 +76,29 @@ func set_object_operation(so, op: int):
 func set_object_shape(so, g_shape: int):
 	if so.g_shape != g_shape:
 		so.g_shape = g_shape
-		
-		
+	
+
+func cutaway_place(cutaway_index : int):
+	_cutaways[cutaway_index].params[SDF.PARAM_TRANSFORM].value = _cutaways[0].params[SDF.PARAM_TRANSFORM].value
+	_cutaways[cutaway_index].params[SDF.PARAM_SIZE_PRIMARY].value = _cutaways[0].params[SDF.PARAM_SIZE_PRIMARY].value
+	_cutaways[cutaway_index].params[SDF.PARAM_LAYER].value = _cutaways[0].params[SDF.PARAM_LAYER].value
+	_cutaways[cutaway_index].params[SDF.PARAM_GENERIC_SHAPE].value = _cutaways[0].params[SDF.PARAM_GENERIC_SHAPE].value
+	_schedule_shader_update()
+	
+	
+func cutaways_reset():
+	# offset by 1 to preserve the Player cutaway
+	for i in _cutaways.size()-1:
+		_cutaways[i+1].params[SDF.PARAM_SIZE_PRIMARY].value = 0.0
+		_cutaways[i+1].params[SDF.PARAM_SIZE_SECONDARY].value = 0.0
+		_cutaways[i+1].params[SDF.PARAM_GENERIC_SHAPE].value = SDF.G_SPHERE
+	_schedule_shader_update()
+
+func cutaway_set_shape(new_shape : int, size1 : float = 3.):
+	_cutaways[0].params[SDF.PARAM_GENERIC_SHAPE].value = new_shape
+	_cutaways[0].params[SDF.PARAM_SIZE_PRIMARY].value = size1
+	_schedule_shader_update()
+	
 
 func schedule_structural_update():
 	_need_objects_update = true
@@ -103,7 +134,7 @@ func _update_shader():
 	_shader_material = ShaderMaterial.new()
 	
 	var code := _generate_shader_code(_objects, _shader_template, _cutaways)
-	set_shrink(shrink)
+	calibrate_shrink(shrink, 1.)
 	# This is for debugging
 	#_debug_dump_text_file("generated_shader.txt", code)
 
@@ -229,10 +260,10 @@ static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> Stri
 		SDF.SHAPE_GENERIC:
 			return str("get_generic_shape(",
 				_get_param_code(obj, SDF.PARAM_GENERIC_SHAPE),",",
-				pos_code, ",",_get_param_code(obj, SDF.PARAM_OFFSET), ",",
+				pos_code, ",",_get_param_code(obj, SDF.PARAM_OFFSET), "* shrink,",
 				_get_param_code(obj, SDF.PARAM_ROUNDING),",",
-				_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1),",",
-				_get_param_code(obj, SDF.PARAM_SIZE_SECONDARY-cut_layer*.1),")")
+				_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY-cut_layer*.1),"* shrink,",
+				_get_param_code(obj, SDF.PARAM_SIZE_SECONDARY-cut_layer*.1),"* shrink)")
 					
 		SDF.SHAPE_SPHERE:
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
@@ -245,8 +276,8 @@ static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> Stri
 
 		SDF.SHAPE_TORUS:
 			return str("get_torus(", pos_code, 
-				", vec2(", _get_param_code(obj, SDF.PARAM_RADIUS),"*shrink",
-				", ", _get_param_code(obj, SDF.PARAM_THICKNESS), "*shrink))")
+				", vec2(", _get_param_code(obj, SDF.PARAM_RADIUS),"* shrink",
+				", ", _get_param_code(obj, SDF.PARAM_THICKNESS), "* shrink))")
 
 		SDF.SHAPE_CYLINDER:
 			return str("get_rounded_cylinder(", pos_code, 

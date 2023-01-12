@@ -17,9 +17,10 @@ const float NORMAL_PRECISION = 0.0005;
 
 const int SPHERE  = 0;
 const int ROUNDED_BOX = 1;
-const int ROUNDED_CONE = 2;
-const int PLANE = 3;
-const int CYLINDER = 4;
+const int TORUS = 2;
+const int CYLINDER = 3;
+const int ROUNDED_CONE = 4;
+const int PLANE = 5;
 
 
 void vertex() {
@@ -79,19 +80,28 @@ float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
                         return (sqrt(x2*a2*il2)+y*rr)*il2 - r1;
 }
 
+float sdPlane( vec3 p, vec3 n, float h )
+{
+  // n must be normalized
+  return dot(p,n) + h;
+}
+
 float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2 ){
 	float d = 0.;
 	switch (shape_sel){
 		case SPHERE:
 		    d = get_sphere(p,offset,size1);
 			break;
-		case ROUNDED_BOX:
-			d = get_rounded_box(p,vec3(size1),rounding);
+		case PLANE:
+			d = sdPlane(p, vec3(0,0,-1), size1 );
 			break;
 		case ROUNDED_CONE:
 			d = get_round_cone(p, vec3(0.0), offset,size1,size2);
 			break;
 			//float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
+		case ROUNDED_BOX:
+			d = get_rounded_box(p,vec3(size1),rounding);
+			break;
 		case CYLINDER:
 			d = get_rounded_cylinder(p, size1, rounding, size2);
 			break;

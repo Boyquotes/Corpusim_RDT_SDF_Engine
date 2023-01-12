@@ -6,7 +6,10 @@ const MAX_SPEED :float = 5.0
 const MOUSE_SENSITIVITY : float = 0.0015
 var speed : float = MAX_SPEED
 
-@onready var sdf_container = $"%SDFContainer"
+const SDFContainer = preload("res://addons/sdf_rdt/sdf_container.gd")
+const SDFGeneric = preload("res://addons/sdf_rdt/sdf_generic.gd")
+
+@onready var sdf_container : SDFContainer = $"%SDFContainer"
 @onready var hierarch = $"%Hierarch"
 @onready var hud = $"../HUD"
 
@@ -21,12 +24,20 @@ var VELOCITY_ROLL_MAX : float = .03;
 var shrink1_pos : Vector3 = Vector3()
 
 const SDF = preload("res://addons/sdf_rdt/sdf.gd")
-var cutaway_type : String = "sphere"
+
+var cutaway_shape : int = SDF.G_SPHERE
+var cutaway_shape_index : int = 0
+const cutaway_shape_index_max : int = 2
+
 var cutaway_index = 1
-var cutaway_index_max = 1
+@export var cutaway_index_max = 4
 const cutaway_radius: float = 3.0
-const cutaway_size: Vector3 = Vector3(3,3,3)
-var cutaways : Array= []
+const CUTAWAY_SIZE_SPHERE : float = 3.0
+const CUTAWAY_SIZE_PLANE : float = -1.5
+const CUTAWAY_SIZE_BOX : float = 3.0
+var cutaway_normalized_size : float = CUTAWAY_SIZE_SPHERE
+
+
 
 
 func _ready():
@@ -37,8 +48,23 @@ func _ready():
 	_reset_cutaways()
 	
 
+# TODO: Spawn cutaways up to cutaway_index_max+1
 func _init_cutaways():
-	pass	
+	var new_cut = SDFGeneric.new()
+	new_cut.operation = SDF.OP_CUTAWAY
+	new_cut.g_shape = SDF.G_SPHERE
+	new_cut.follows_probe = true
+	sdf_container.add_child(new_cut)
+	
+	for i in cutaway_index_max:
+		new_cut = SDFGeneric.new()
+		new_cut.operation = SDF.OP_CUTAWAY
+		new_cut.g_shape = SDF.G_SPHERE
+		new_cut.size_primary = 0.0
+		new_cut.size_secondary = 0.0
+		sdf_container.add_child(new_cut)
+		
+	cutaway_index = 1
 	
 		
 	
@@ -64,10 +90,7 @@ func _process_input():
 		_reset_cutaways()
 		
 	if Input.is_action_just_pressed("cutaway_change_type"):
-		if cutaway_type == "sphere":
-			cutaway_type = "box"
-		else:
-			cutaway_type = "sphere"
+		_change_cutaway_shape()
 		
 
 func _process_shrink():
@@ -80,8 +103,7 @@ func _process_shrink():
 	var shrink_delta = shrink_target-shrink
 	if abs(shrink_delta) > .01:
 		shrink = move_toward(shrink, shrink_target, abs(shrink_delta)*.1)
-		_calibrate_cutaway_shrink()
-		sdf_container.set_shrink(shrink)
+		sdf_container.calibrate_shrink(shrink, cutaway_normalized_size)
 		hierarch.set_shrink(shrink)
 		hud.get_node("msg").text = "Shrink: %0.3f" % shrink 
 		position = shrink1_pos*shrink			
@@ -146,48 +168,42 @@ func _physics_process(_delta):
 	shrink1_pos = position/shrink
 
 func _calibrate_cutaway_shrink():
-	cutaways[0].size = cutaways[0].size / shrink
-	if len(cutaways) > 0:
-		if false && cutaway_type == "sphere":
-			cutaways[0].radius = cutaway_radius/shrink
-			cutaways[0].layer = .1*cutaways[0].radius
-		elif cutaway_type == "box":
-			cutaways[0].size = cutaway_size/shrink
-			cutaways[0].layer = .2*cutaways[0].size.x
+	sdf_container.calibrate_shrink(shrink, cutaway_normalized_size)
+	
 
 
 
 func _place_cutaway():
-	
-
-	
 	if cutaway_index < cutaway_index_max:
-		cutaways[cutaway_index].position = cutaways[0].position
-		cutaways[cutaway_index].size = cutaways[0].size
+		sdf_container.cutaway_place(cutaway_index)
 		cutaway_index += 1
 		_calibrate_cutaway_shrink()
 	else:
 		print("Max Cutaways Placed. Right Mouse Button to Reset Cutaways.")
 	
-	if cutaway_type == "sphere":
-		pass
-	else:
-		pass
-	
-
-		
-	
-	
-	
 
 func _reset_cutaways():
-	return
-	cutaways[0].size = 3.0
-	cutaways[0].position = position
-	for i in len(cutaways):
-		# size 0, position 0
-		pass
-		
+	cutaway_index = 1
+	sdf_container.cutaways_reset()
 
+func _change_cutaway_shape():
+	if cutaway_shape_index < cutaway_shape_index_max:
+		cutaway_shape_index += 1
+	else:
+		cutaway_shape_index = 0
 	
-	
+	match cutaway_shape_index:
+		0:
+			sdf_container.cutaway_set_shape(SDF.G_SPHERE)
+			cutaway_normalized_size = CUTAWAY_SIZE_SPHERE
+		1:
+			sdf_container.cutaway_set_shape(SDF.G_PLANE, CUTAWAY_SIZE_PLANE)
+			cutaway_normalized_size = CUTAWAY_SIZE_PLANE
+		2:
+			sdf_container.cutaway_set_shape(SDF.G_BOX)
+			cutaway_normalized_size = CUTAWAY_SIZE_SPHERE
+		_: 
+			sdf_container.cutaway_set_shape(SDF.G_SPHERE)
+			cutaway_normalized_size = CUTAWAY_SIZE_SPHERE
+			print("Misconfigured # of cutaway shapes in Player.gd")
+			

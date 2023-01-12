@@ -32,6 +32,7 @@ const G_BOX = 1
 const G_TORUS = 2
 const G_CYLINDER = 3
 const G_ROUNDCONE = 4
+const G_PLANE = 5
 
 
 

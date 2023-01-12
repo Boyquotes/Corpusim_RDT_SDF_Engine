@@ -29,8 +29,7 @@ extends "./sdf_item.gd"
 		offset = o # Useless but doing it anyways
 		_set_param(SDF.PARAM_OFFSET, o)
 
-
-@export_enum("Sphere", "Box", "Round Cone", "Plane", "Cylinder") var g_shape:int:
+@export_enum("Sphere", "Box", "Torus", "Cylinder", "Rounded Cone", "Plane") var g_shape:int = SDF.G_SPHERE:
 	get:
 		return _get_param(SDF.PARAM_GENERIC_SHAPE)
 	set(s):
