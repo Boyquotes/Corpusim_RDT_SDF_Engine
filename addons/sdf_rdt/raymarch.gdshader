@@ -93,7 +93,7 @@ float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, floa
 		    d = get_sphere(p,offset,size1);
 			break;
 		case PLANE:
-			d = sdPlane(p, vec3(0,0,-1), size1 );
+			d = sdPlane(p, vec3(0,0,-1), size1);
 			break;
 		case ROUNDED_CONE:
 			d = get_round_cone(p, vec3(0.0), offset,size1,size2);

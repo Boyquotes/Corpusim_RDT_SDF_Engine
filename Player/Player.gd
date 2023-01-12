@@ -16,7 +16,7 @@ const SDFGeneric = preload("res://addons/sdf_rdt/sdf_generic.gd")
 const SHRINK_MIN : float = 1.0
 const SHRINK_MAX : float = 50.0
 var shrink : float = SHRINK_MIN
-var shrink_target : float = shrink
+var shrink_target : float = SHRINK_MIN
 
 var velocity_roll : float = 0.
 var VELOCITY_ROLL_MAX : float = .03;
@@ -30,11 +30,12 @@ var cutaway_shape_index : int = 0
 const cutaway_shape_index_max : int = 2
 
 var cutaway_index = 1
-@export var cutaway_index_max = 4
-const cutaway_radius: float = 3.0
+var cutaways = []
+var probe_cut
+
 const CUTAWAY_SIZE_SPHERE : float = 3.0
-const CUTAWAY_SIZE_PLANE : float = -1.5
-const CUTAWAY_SIZE_BOX : float = 3.0
+const CUTAWAY_SIZE_PLANE : float = -2.5
+const CUTAWAY_SIZE_BOX : float = (pow(2, 1/3) * CUTAWAY_SIZE_SPHERE)
 var cutaway_normalized_size : float = CUTAWAY_SIZE_SPHERE
 
 
@@ -46,27 +47,22 @@ func _ready():
 	shrink1_pos = position
 	_init_cutaways()
 	_reset_cutaways()
+	_calibrate_cutaway_shrink()
 	
 
-# TODO: Spawn cutaways up to cutaway_index_max+1
+	
+
 func _init_cutaways():
-	var new_cut = SDFGeneric.new()
-	new_cut.operation = SDF.OP_CUTAWAY
-	new_cut.g_shape = SDF.G_SPHERE
-	new_cut.follows_probe = true
-	sdf_container.add_child(new_cut)
-	
-	for i in cutaway_index_max:
-		new_cut = SDFGeneric.new()
-		new_cut.operation = SDF.OP_CUTAWAY
-		new_cut.g_shape = SDF.G_SPHERE
-		new_cut.size_primary = 0.0
-		new_cut.size_secondary = 0.0
-		sdf_container.add_child(new_cut)
+	for child in sdf_container.get_children():
+		if child.operation == SDF.OP_CUTAWAY:
+			cutaways.append(child)
 		
+	# reference / alias: writes to cutaways[0]
+	probe_cut = cutaways[0]
+	
+	probe_cut.g_shape = SDF.G_SPHERE
+	probe_cut.follows_probe = true
 	cutaway_index = 1
-	
-		
 	
 
 func _process(_delta):
@@ -94,7 +90,9 @@ func _process_input():
 		
 
 func _process_shrink():
+	#TODO : make logarithmic so shrink speed feels consistent
 	var shrink_speed : float = .55
+	
 	if Input.is_action_just_released("shrink_increase"):
 		shrink_target = clampf(shrink_target+shrink_speed,SHRINK_MIN, SHRINK_MAX)
 	if Input.is_action_just_released("shrink_decrease"):
@@ -103,7 +101,8 @@ func _process_shrink():
 	var shrink_delta = shrink_target-shrink
 	if abs(shrink_delta) > .01:
 		shrink = move_toward(shrink, shrink_target, abs(shrink_delta)*.1)
-		sdf_container.calibrate_shrink(shrink, cutaway_normalized_size)
+		_calibrate_cutaway_shrink()
+		sdf_container.calibrate_shrink(shrink)
 		hierarch.set_shrink(shrink)
 		hud.get_node("msg").text = "Shrink: %0.3f" % shrink 
 		position = shrink1_pos*shrink			
@@ -168,23 +167,35 @@ func _physics_process(_delta):
 	shrink1_pos = position/shrink
 
 func _calibrate_cutaway_shrink():
-	sdf_container.calibrate_shrink(shrink, cutaway_normalized_size)
+	if cutaways.size() > 0:
+		probe_cut.size_primary = cutaway_normalized_size / shrink
+		probe_cut.layer = .1 * probe_cut.size_primary
 	
 
-
-
 func _place_cutaway():
-	if cutaway_index < cutaway_index_max:
-		sdf_container.cutaway_place(cutaway_index)
+	if cutaway_index < cutaways.size() - 1:
+		cutaways[cutaway_index].transform = probe_cut.transform
+		cutaways[cutaway_index].size_primary = probe_cut.size_primary
+		cutaways[cutaway_index].size_secondary = probe_cut.size_secondary
+		cutaways[cutaway_index].layer = probe_cut.layer
+		cutaways[cutaway_index].g_shape = probe_cut.g_shape
+		cutaways[cutaway_index].rounding = probe_cut.rounding
 		cutaway_index += 1
-		_calibrate_cutaway_shrink()
 	else:
 		print("Max Cutaways Placed. Right Mouse Button to Reset Cutaways.")
 	
 
 func _reset_cutaways():
+	# offset by 1 to preserve probe cutaway
+	for i in cutaways.size()-1:
+		cutaways[i+1].size_primary = 0.0
+		cutaways[i+1].size_secondary = 0.0
+		cutaways[i+1].g_shape = SDF.G_SPHERE
+		
 	cutaway_index = 1
-	sdf_container.cutaways_reset()
+		
+		
+	
 
 func _change_cutaway_shape():
 	if cutaway_shape_index < cutaway_shape_index_max:
@@ -194,16 +205,25 @@ func _change_cutaway_shape():
 	
 	match cutaway_shape_index:
 		0:
-			sdf_container.cutaway_set_shape(SDF.G_SPHERE)
+			probe_cut.g_shape = SDF.G_SPHERE
+			probe_cut.size_primary = CUTAWAY_SIZE_SPHERE
 			cutaway_normalized_size = CUTAWAY_SIZE_SPHERE
+			print("Sphere Cutaway")
 		1:
-			sdf_container.cutaway_set_shape(SDF.G_PLANE, CUTAWAY_SIZE_PLANE)
+			probe_cut.g_shape = SDF.G_PLANE
+			probe_cut.size_primary = CUTAWAY_SIZE_PLANE
 			cutaway_normalized_size = CUTAWAY_SIZE_PLANE
+			print("Plane Cutaway")
 		2:
-			sdf_container.cutaway_set_shape(SDF.G_BOX)
-			cutaway_normalized_size = CUTAWAY_SIZE_SPHERE
+			probe_cut.g_shape = SDF.G_BOX
+			probe_cut.size_primary = CUTAWAY_SIZE_BOX
+			cutaway_normalized_size = CUTAWAY_SIZE_BOX
+			print("Box Cutaway")
 		_: 
-			sdf_container.cutaway_set_shape(SDF.G_SPHERE)
+			probe_cut.g_shape = SDF.G_SPHERE
+			probe_cut.size_primary = CUTAWAY_SIZE_SPHERE
 			cutaway_normalized_size = CUTAWAY_SIZE_SPHERE
 			print("Misconfigured # of cutaway shapes in Player.gd")
+			
+	_calibrate_cutaway_shrink()
 			
