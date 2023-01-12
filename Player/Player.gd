@@ -27,7 +27,7 @@ const SDF = preload("res://addons/sdf_rdt/sdf.gd")
 
 var cutaway_shape : int = SDF.G_SPHERE
 var cutaway_shape_index : int = 0
-const cutaway_shape_index_max : int = 2
+const cutaway_shape_index_max : int = 3
 
 var cutaway_index = 1
 var cutaways = []
@@ -57,7 +57,7 @@ func _init_cutaways():
 		if child.operation == SDF.OP_CUTAWAY:
 			cutaways.append(child)
 		
-	# reference / alias: writes to cutaways[0]
+	# alias: writes to cutaways[0]
 	probe_cut = cutaways[0]
 	
 	probe_cut.g_shape = SDF.G_SPHERE
@@ -173,7 +173,7 @@ func _calibrate_cutaway_shrink():
 	
 
 func _place_cutaway():
-	if cutaway_index < cutaways.size() - 1:
+	if cutaway_index < cutaways.size():
 		cutaways[cutaway_index].transform = probe_cut.transform
 		cutaways[cutaway_index].size_primary = probe_cut.size_primary
 		cutaways[cutaway_index].size_secondary = probe_cut.size_secondary

@@ -12,12 +12,14 @@ const SphereGizmo = preload("./sphere_gizmo.gd")
 const BoxGizmo = preload("./box_gizmo.gd")
 const CylinderGizmo = preload("./cylinder_gizmo.gd")
 const TorusGizmo = preload("./torus_gizmo.gd")
+const GenericGizmo = preload("./generic_gizmo.gd")
 
 var _gizmo_plugins : Array[Variant] = [
 	SphereGizmo.new(),
 	BoxGizmo.new(),
 	CylinderGizmo.new(),
-	TorusGizmo.new()
+	TorusGizmo.new(),
+	GenericGizmo.new()
 ]
 
 
