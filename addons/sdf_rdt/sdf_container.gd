@@ -5,12 +5,7 @@ const SDF = preload("./sdf.gd")
 var SDFItem = load("res://addons/sdf_rdt/sdf_item.gd")
 var SDFGeneric = load("res://addons/sdf_rdt/sdf_generic.gd")
 
-
-
 const SHADER_PATH = "res://addons/sdf_rdt/raymarch.gdshader"
-
-
-	
 
 class ShaderTemplate:
 	var before_uniforms := ""
@@ -91,6 +86,7 @@ func _process(delta):
 		_update_shader()
 	
 	set_process(false)
+
 
 
 func _update_shader():

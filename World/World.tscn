@@ -12,7 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="8_eob7v"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="9_7c4ph"]
 
-[sub_resource type="Shader" id="Shader_8atho"]
+[sub_resource type="Shader" id="Shader_i6060"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -136,6 +136,99 @@ void vertex() {
 
 float dot2( in vec3 v ) {
 	 return dot(v,v); 
+}
+
+float rand3d(vec3 p)
+{
+	return fract(sin(dot(p ,vec3(12.9898,78.233,128.852))) * 43758.5453)*2.0-1.0;
+}
+
+float noise3D(vec3 p)
+{
+	
+	float f3 = 1.0/3.0;
+	float s = (p.x+p.y+p.z)*f3;
+	int i = int(floor(p.x+s));
+	int j = int(floor(p.y+s));
+	int k = int(floor(p.z+s));
+	
+	float g3 = 1.0/6.0;
+	float t = float((i+j+k))*g3;
+	float x0 = float(i)-t;
+	float y0 = float(j)-t;
+	float z0 = float(k)-t;
+	x0 = p.x-x0;
+	y0 = p.y-y0;
+	z0 = p.z-z0;
+	
+	int i1,j1,k1;
+	int i2,j2,k2;
+	
+	if(x0>=y0)
+	{
+		if(y0>=z0){ i1=1; j1=0; k1=0; i2=1; j2=1; k2=0; } // X Y Z order
+		else if(x0>=z0){ i1=1; j1=0; k1=0; i2=1; j2=0; k2=1; } // X Z Y order
+		else { i1=0; j1=0; k1=1; i2=1; j2=0; k2=1; }  // Z X Z order
+	}
+	else 
+	{ 
+		if(y0<z0) { i1=0; j1=0; k1=1; i2=0; j2=1; k2=1; } // Z Y X order
+		else if(x0<z0) { i1=0; j1=1; k1=0; i2=0; j2=1; k2=1; } // Y Z X order
+		else { i1=0; j1=1; k1=0; i2=1; j2=1; k2=0; } // Y X Z order
+	}
+	
+	float x1 = x0 - float(i1) + g3; 
+	float y1 = y0 - float(j1) + g3;
+	float z1 = z0 - float(k1) + g3;
+	float x2 = x0 - float(i2) + 2.0*g3; 
+	float y2 = y0 - float(j2) + 2.0*g3;
+	float z2 = z0 - float(k2) + 2.0*g3;
+	float x3 = x0 - 1.0 + 3.0*g3; 
+	float y3 = y0 - 1.0 + 3.0*g3;
+	float z3 = z0 - 1.0 + 3.0*g3;	
+				 
+	// Godot choking on `vec3(int,int,int)` 
+	vec3 ijk0 = vec3(float(i),float(j),float(k));
+	vec3 ijk1 = vec3(float(i+i1),float(j+j1),float(k+k1));
+	vec3 ijk2 = vec3(float(i+i2),float(j+j2),float(k+k2));
+	vec3 ijk3 = vec3(float(i+1),float(j+1),float(k+1));
+            
+	vec3 gr0 = normalize(vec3(rand3d(ijk0),rand3d(ijk0*2.01),rand3d(ijk0*2.02)));
+	vec3 gr1 = normalize(vec3(rand3d(ijk1),rand3d(ijk1*2.01),rand3d(ijk1*2.02)));
+	vec3 gr2 = normalize(vec3(rand3d(ijk2),rand3d(ijk2*2.01),rand3d(ijk2*2.02)));
+	vec3 gr3 = normalize(vec3(rand3d(ijk3),rand3d(ijk3*2.01),rand3d(ijk3*2.02)));
+	
+	float n0 = 0.0;
+	float n1 = 0.0;
+	float n2 = 0.0;
+	float n3 = 0.0;
+
+	float t0 = 0.5 - x0*x0 - y0*y0 - z0*z0;
+	if(t0>=0.0)
+	{
+		t0*=t0;
+		n0 = t0 * t0 * dot(gr0, vec3(x0, y0, z0));
+	}
+	float t1 = 0.5 - x1*x1 - y1*y1 - z1*z1;
+	if(t1>=0.0)
+	{
+		t1*=t1;
+		n1 = t1 * t1 * dot(gr1, vec3(x1, y1, z1));
+	}
+	float t2 = 0.5 - x2*x2 - y2*y2 - z2*z2;
+	if(t2>=0.0)
+	{
+		t2 *= t2;
+		n2 = t2 * t2 * dot(gr2, vec3(x2, y2, z2));
+	}
+	float t3 = 0.5 - x3*x3 - y3*y3 - z3*z3;
+	if(t3>=0.0)
+	{
+		t3 *= t3;
+		n3 = t3 * t3 * dot(gr3, vec3(x3, y3, z3));
+	}
+	return 96.0*(n0+n1+n2+n3);
+	
 }
 
 
@@ -287,7 +380,8 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape7_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape7_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape7_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape7_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape7_generic_shape,(u_shape7_transform * vec4(p, shrink)).xyz,u_shape7_offset* shrink,u_shape7_rounding * shrink,u_shape7_size_primary* shrink,u_shape7_size_secondary* shrink),.05 * shrink))))), s.rgb, u_shape7_color.rgb, u_shape7_smoothness*shrink);
 	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape8_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape8_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape8_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape8_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape8_generic_shape,(u_shape8_transform * vec4(p, shrink)).xyz,u_shape8_offset* shrink,u_shape8_rounding * shrink,u_shape8_size_primary* shrink,u_shape8_size_secondary* shrink),.05 * shrink))))), s.rgb, u_shape8_color.rgb, u_shape8_smoothness*shrink);
 	
-		
+	// add noise, for visual intrigue
+	s.w -= noise3D(p);
 	return s;
 }
 
@@ -302,7 +396,7 @@ vec3 get_normal(vec3 p, float time, vec3 world_cam_pos) {
 }
 
 vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, vec3 world_cam_pos) {
-	// Sphere marching
+	// Sphere tracing
 	float d = 0.0;
 	vec3 rgb;
 	for (int i = 0; i < MAX_STEPS; ++i) {
@@ -318,6 +412,7 @@ vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, ve
 
 	vec3 hit_pos = ray_origin + ray_dir * d;
 	out_normal = get_normal(hit_pos, time, world_cam_pos);
+	
 
 	return vec4(rgb, d);
 }
@@ -343,6 +438,7 @@ void fragment() {
 	if (d > MAX_DISTANCE * shrink) {
 		discard;
 	}
+
 	
 	vec4 sdf_ndc = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ray_origin + ray_dir * d, 1.0);
 	DEPTH = (sdf_ndc.z / sdf_ndc.w) * 0.5 + 0.5;
@@ -363,9 +459,9 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_3lm3f"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_i3wah"]
 render_priority = 0
-shader = SubResource("Shader_8atho")
+shader = SubResource("Shader_i6060")
 shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.06444, -4.4692, 27.2545)
 shader_parameter/u_shape5_smoothness = 0.2
 shader_parameter/u_shape5_size = Vector3(2.173, 5, 3.988)
@@ -463,18 +559,18 @@ shader_parameter/u_shape1001_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 
 shader_parameter/u_shape1001_smoothness = 0.2
 shader_parameter/u_shape1001_size_secondary = 0.0
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_tq1jy"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_5veb8"]
 flip_faces = true
 orientation = 2
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fkooi"]
 shader = ExtResource("7_liiw3")
-shader_parameter/colorA = Color(0.498039, 0.294118, 0.239216, 1)
-shader_parameter/colorB = Color(0.129412, 0, 0.176471, 1)
+shader_parameter/colorA = Color(0.305882, 0.180392, 0.14902, 1)
+shader_parameter/colorB = Color(0.121569, 0.0470588, 0.0352941, 1)
 shader_parameter/patch_size = 0.47
 shader_parameter/patch_start = 0.408
 shader_parameter/repetition = 3.5
-shader_parameter/speed = 0.076
+shader_parameter/speed = 0.04
 
 [sub_resource type="Sky" id="Sky_us488"]
 sky_material = SubResource("ShaderMaterial_fkooi")
@@ -497,8 +593,9 @@ volumetric_fog_length = 40.0
 volumetric_fog_sky_affect = 0.7
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_sdjvp"]
+exposure_multiplier = 1.5
 dof_blur_far_enabled = true
-dof_blur_far_distance = 1.03
+dof_blur_far_distance = 6.67
 dof_blur_far_transition = 188.51
 dof_blur_near_distance = 0.18
 dof_blur_near_transition = 0.1
@@ -513,9 +610,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_3lm3f")
+material_override = SubResource("ShaderMaterial_i3wah")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_tq1jy")
+mesh = SubResource("PlaneMesh_5veb8")
 script = ExtResource("2_vw6ij")
 
 [node name="Cutaway1" type="Node3D" parent="SDFContainer"]

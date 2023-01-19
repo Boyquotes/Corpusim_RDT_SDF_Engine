@@ -41,6 +41,18 @@ float noise3D(vec3 p){
 		
 }
 
+float fbm(vec3 p)
+{
+	float f;
+    f = noise3D(p); p*2.01;
+	f += 0.5*noise3D( p ); p = p*2.02;
+    //f += .25*noise3D( p ); p = p*2.03; 
+    //f += .125*noise3D( p ); p = p*2.04;
+    //f += .0625*noise3D( p ); p = p*2.05;
+    //f += .03125*noise3D( p );
+	return f;
+}
+
 vec3 sphereProject(vec2 q){
 	float theta = q.y * 3.14159;
 	float phi = q.x * 3.14159 * 2.0;
@@ -66,7 +78,7 @@ void sky() {
     // Add a random position
     float a = 0.0;
     vec3 vel = vec3(time)*3.;
-	DF += noise3D(pos+vel)*.25+.25;
+	DF += fbm(pos+vel)*.25+.25;
 
     // Add a random position
     a = noise3D(pos* vec3(cos(time*0.15),sin(time*0.1),sin(time*0.13)) *0.1)*3.1415;
