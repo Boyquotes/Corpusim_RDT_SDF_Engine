@@ -27,7 +27,7 @@ const SDF = preload("res://addons/sdf_rdt/sdf.gd")
 
 var cutaway_shape : int = SDF.G_SPHERE
 var cutaway_shape_index : int = 0
-const cutaway_shape_index_max : int = 3
+const cutaway_shape_index_max : int = 2
 
 var cutaway_index = 1
 var cutaways = []
@@ -62,6 +62,8 @@ func _init_cutaways():
 	
 	probe_cut.g_shape = SDF.G_SPHERE
 	probe_cut.follows_probe = true
+	print("probe cut: ", probe_cut)
+	print("follows: ", probe_cut.follows_probe)
 	cutaway_index = 1
 	
 

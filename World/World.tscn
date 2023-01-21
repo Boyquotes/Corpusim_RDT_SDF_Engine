@@ -1,18 +1,13 @@
-[gd_scene load_steps=19 format=3 uid="uid://bqdf7gfmu851f"]
+[gd_scene load_steps=14 format=3 uid="uid://bqdf7gfmu851f"]
 
 [ext_resource type="PackedScene" uid="uid://bdm56ujj65teb" path="res://Player/Player.tscn" id="1_an2so"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_container.gd" id="2_vw6ij"]
-[ext_resource type="Script" path="res://addons/sdf_rdt/sdf_box.gd" id="3_bighi"]
-[ext_resource type="Script" path="res://addons/sdf_rdt/SDF_Manipulator.gd" id="4_0ln3o"]
-[ext_resource type="PackedScene" uid="uid://cwlmvu3fd4mx6" path="res://Geo/SDF_Manip.tscn" id="4_et84q"]
-[ext_resource type="Script" path="res://addons/sdf_rdt/sdf_sphere.gd" id="5_co4p6"]
-[ext_resource type="Script" path="res://addons/sdf_rdt/sdf_torus.gd" id="6_ragbq"]
 [ext_resource type="Shader" path="res://World/sky_shader.gdshader" id="7_liiw3"]
 [ext_resource type="Script" path="res://addons/sdf_rdt/sdf_generic.gd" id="7_vvng6"]
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="8_eob7v"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="9_7c4ph"]
 
-[sub_resource type="Shader" id="Shader_i6060"]
+[sub_resource type="Shader" id="Shader_6mby5"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -46,73 +41,60 @@ uniform float u_shape1002_size_secondary;
 uniform int u_shape1002_generic_shape;
 uniform float u_shape1002_rounding;
 uniform vec3 u_shape1002_offset;
-uniform mat4 u_shape1003_transform;
-uniform vec4 u_shape1003_color;
-uniform float u_shape1003_smoothness;
-uniform float u_shape1003_layer;
-uniform float u_shape1003_size_primary;
-uniform float u_shape1003_size_secondary;
-uniform int u_shape1003_generic_shape;
-uniform float u_shape1003_rounding;
-uniform vec3 u_shape1003_offset;
 uniform mat4 u_shape0_transform;
 uniform vec4 u_shape0_color;
 uniform float u_shape0_smoothness;
 uniform float u_shape0_layer;
-uniform vec3 u_shape0_size;
+uniform float u_shape0_size_primary;
+uniform float u_shape0_size_secondary;
+uniform int u_shape0_generic_shape;
 uniform float u_shape0_rounding;
+uniform vec3 u_shape0_offset;
 uniform mat4 u_shape1_transform;
 uniform vec4 u_shape1_color;
 uniform float u_shape1_smoothness;
 uniform float u_shape1_layer;
-uniform vec3 u_shape1_size;
+uniform float u_shape1_size_primary;
+uniform float u_shape1_size_secondary;
+uniform int u_shape1_generic_shape;
 uniform float u_shape1_rounding;
+uniform vec3 u_shape1_offset;
 uniform mat4 u_shape2_transform;
 uniform vec4 u_shape2_color;
 uniform float u_shape2_smoothness;
 uniform float u_shape2_layer;
-uniform float u_shape2_radius;
+uniform float u_shape2_size_primary;
+uniform float u_shape2_size_secondary;
+uniform int u_shape2_generic_shape;
+uniform float u_shape2_rounding;
+uniform vec3 u_shape2_offset;
 uniform mat4 u_shape3_transform;
 uniform vec4 u_shape3_color;
 uniform float u_shape3_smoothness;
 uniform float u_shape3_layer;
-uniform float u_shape3_radius;
+uniform float u_shape3_size_primary;
+uniform float u_shape3_size_secondary;
+uniform int u_shape3_generic_shape;
+uniform float u_shape3_rounding;
+uniform vec3 u_shape3_offset;
 uniform mat4 u_shape4_transform;
 uniform vec4 u_shape4_color;
 uniform float u_shape4_smoothness;
 uniform float u_shape4_layer;
-uniform vec3 u_shape4_size;
+uniform float u_shape4_size_primary;
+uniform float u_shape4_size_secondary;
+uniform int u_shape4_generic_shape;
 uniform float u_shape4_rounding;
+uniform vec3 u_shape4_offset;
 uniform mat4 u_shape5_transform;
 uniform vec4 u_shape5_color;
 uniform float u_shape5_smoothness;
 uniform float u_shape5_layer;
-uniform vec3 u_shape5_size;
+uniform float u_shape5_size_primary;
+uniform float u_shape5_size_secondary;
+uniform int u_shape5_generic_shape;
 uniform float u_shape5_rounding;
-uniform mat4 u_shape6_transform;
-uniform vec4 u_shape6_color;
-uniform float u_shape6_smoothness;
-uniform float u_shape6_layer;
-uniform float u_shape6_radius;
-uniform float u_shape6_thickness;
-uniform mat4 u_shape7_transform;
-uniform vec4 u_shape7_color;
-uniform float u_shape7_smoothness;
-uniform float u_shape7_layer;
-uniform float u_shape7_size_primary;
-uniform float u_shape7_size_secondary;
-uniform int u_shape7_generic_shape;
-uniform float u_shape7_rounding;
-uniform vec3 u_shape7_offset;
-uniform mat4 u_shape8_transform;
-uniform vec4 u_shape8_color;
-uniform float u_shape8_smoothness;
-uniform float u_shape8_layer;
-uniform float u_shape8_size_primary;
-uniform float u_shape8_size_secondary;
-uniform int u_shape8_generic_shape;
-uniform float u_shape8_rounding;
-uniform vec3 u_shape8_offset;
+uniform vec3 u_shape5_offset;
 
 uniform vec3 fog_color : source_color = vec3(.005);
 uniform float shrink = 1.0;
@@ -231,6 +213,18 @@ float noise3D(vec3 p)
 	
 }
 
+// TODO: employ tf uniforms to rotate noise with object
+float surface_noise(in vec3 p){
+	float f;
+	//f = 0.5*noise3D( f ); p = p*2.05;
+    //f += 0.25*simplex3D( f ); p = p*2.1;
+	//f = noise3D(0.5*p/shrink)*.03*shrink; p = p*15.3;
+	f = smoothstep(0.,.3,noise3D(TIME*.09+0.2*p/shrink))*.13*shrink;
+	p = p*2.3;
+	f += noise3D(TIME*.14+p/shrink)*.04*shrink;
+	return f;
+}
+
 
 float get_sphere(vec3 p, vec3 center, float radius) {
 	return length(p - center) - radius;
@@ -300,10 +294,13 @@ float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, floa
 			break;
 			//float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
 		case ROUNDED_BOX:
-			d = get_rounded_box(p,vec3(size1),rounding);
+			d = get_rounded_box(p,vec3(size1,size2,size1),rounding);
 			break;
 		case CYLINDER:
 			d = get_rounded_cylinder(p, size1, rounding, size2);
+			break;
+		case TORUS:
+			d = get_torus(p, vec2(size1,size2) );
 			break;
 		default:
 		    d = get_sphere(p,offset,size2);
@@ -370,20 +367,22 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	vec4 s = vec4(1.0, 1.0, 1.0, 99999.0);
 	
 	
-	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape0_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape0_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape0_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape0_layer * u_shape1000_layer,opOnion(get_rounded_box((u_shape0_transform * vec4(p, shrink)).xyz, u_shape0_size * shrink , u_shape0_rounding),.05 * shrink))))), s.rgb, u_shape0_color.rgb, u_shape0_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape1_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape1_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape1_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape1_layer * u_shape1000_layer,opOnion(get_rounded_box((u_shape1_transform * vec4(p, shrink)).xyz, u_shape1_size * shrink , u_shape1_rounding),.05 * shrink))))), s.rgb, u_shape1_color.rgb, u_shape1_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape2_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape2_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape2_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape2_layer * u_shape1000_layer,opOnion(get_sphere((u_shape2_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape2_radius * shrink),.05 * shrink))))), s.rgb, u_shape2_color.rgb, u_shape2_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape3_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape3_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape3_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape3_layer * u_shape1000_layer,opOnion(get_sphere((u_shape3_transform * vec4(p, shrink)).xyz, vec3(0.0), u_shape3_radius * shrink),.05 * shrink))))), s.rgb, u_shape3_color.rgb, u_shape3_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape4_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape4_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape4_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape4_layer * u_shape1000_layer,opOnion(get_rounded_box((u_shape4_transform * vec4(p, shrink)).xyz, u_shape4_size * shrink , u_shape4_rounding),.05 * shrink))))), s.rgb, u_shape4_color.rgb, u_shape4_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape5_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape5_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape5_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape5_layer * u_shape1000_layer,opOnion(get_rounded_box((u_shape5_transform * vec4(p, shrink)).xyz, u_shape5_size * shrink , u_shape5_rounding),.05 * shrink))))), s.rgb, u_shape5_color.rgb, u_shape5_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape6_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape6_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape6_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape6_layer * u_shape1000_layer,opOnion(get_torus((u_shape6_transform * vec4(p, shrink)).xyz, vec2(u_shape6_radius* shrink, u_shape6_thickness* shrink)),.05 * shrink))))), s.rgb, u_shape6_color.rgb, u_shape6_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape7_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape7_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape7_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape7_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape7_generic_shape,(u_shape7_transform * vec4(p, shrink)).xyz,u_shape7_offset* shrink,u_shape7_rounding * shrink,u_shape7_size_primary* shrink,u_shape7_size_secondary* shrink),.05 * shrink))))), s.rgb, u_shape7_color.rgb, u_shape7_smoothness*shrink);
-	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1003_generic_shape,(u_shape1003_transform * vec4(p, shrink)).xyz,u_shape1003_offset* shrink,u_shape1003_rounding * shrink,u_shape1003_size_primary* shrink,u_shape1003_size_secondary* shrink)- .6 * shrink * u_shape8_layer * u_shape1003_layer,max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape8_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape8_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape8_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape8_generic_shape,(u_shape8_transform * vec4(p, shrink)).xyz,u_shape8_offset* shrink,u_shape8_rounding * shrink,u_shape8_size_primary* shrink,u_shape8_size_secondary* shrink),.05 * shrink))))), s.rgb, u_shape8_color.rgb, u_shape8_smoothness*shrink);
+	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape0_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape0_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape0_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape0_generic_shape,(u_shape0_transform * vec4(p, shrink)).xyz,u_shape0_offset* shrink,u_shape0_rounding * shrink,u_shape0_size_primary* shrink,u_shape0_size_secondary* shrink),.05 * shrink)))), s.rgb, u_shape0_color.rgb, u_shape0_smoothness*shrink);
+	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape1_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape1_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape1_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape1_generic_shape,(u_shape1_transform * vec4(p, shrink)).xyz,u_shape1_offset* shrink,u_shape1_rounding * shrink,u_shape1_size_primary* shrink,u_shape1_size_secondary* shrink),.05 * shrink)))), s.rgb, u_shape1_color.rgb, u_shape1_smoothness*shrink);
+	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape2_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape2_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape2_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape2_generic_shape,(u_shape2_transform * vec4(p, shrink)).xyz,u_shape2_offset* shrink,u_shape2_rounding * shrink,u_shape2_size_primary* shrink,u_shape2_size_secondary* shrink),.05 * shrink)))), s.rgb, u_shape2_color.rgb, u_shape2_smoothness*shrink);
+	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape3_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape3_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape3_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape3_generic_shape,(u_shape3_transform * vec4(p, shrink)).xyz,u_shape3_offset* shrink,u_shape3_rounding * shrink,u_shape3_size_primary* shrink,u_shape3_size_secondary* shrink),.05 * shrink)))), s.rgb, u_shape3_color.rgb, u_shape3_smoothness*shrink);
+	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape4_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape4_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape4_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape4_generic_shape,(u_shape4_transform * vec4(p, shrink)).xyz,u_shape4_offset* shrink,u_shape4_rounding * shrink,u_shape4_size_primary* shrink,u_shape4_size_secondary* shrink),.05 * shrink)))), s.rgb, u_shape4_color.rgb, u_shape4_smoothness*shrink);
+	s = smooth_union_c(s.w, max(-1.*get_generic_shape(u_shape1002_generic_shape,(u_shape1002_transform * vec4(p, shrink)).xyz,u_shape1002_offset* shrink,u_shape1002_rounding * shrink,u_shape1002_size_primary* shrink,u_shape1002_size_secondary* shrink)- .6 * shrink * u_shape5_layer * u_shape1002_layer,max(-1.*get_generic_shape(u_shape1001_generic_shape,(u_shape1001_transform * vec4(p, shrink)).xyz,u_shape1001_offset* shrink,u_shape1001_rounding * shrink,u_shape1001_size_primary* shrink,u_shape1001_size_secondary* shrink)- .6 * shrink * u_shape5_layer * u_shape1001_layer,max(-1.*get_generic_shape(u_shape1000_generic_shape,(u_shape1000_transform * vec4(p, shrink)).xyz,u_shape1000_offset* shrink,u_shape1000_rounding * shrink,u_shape1000_size_primary* shrink,u_shape1000_size_secondary* shrink)- .6 * shrink * u_shape5_layer * u_shape1000_layer,opOnion(get_generic_shape(u_shape5_generic_shape,(u_shape5_transform * vec4(p, shrink)).xyz,u_shape5_offset* shrink,u_shape5_rounding * shrink,u_shape5_size_primary* shrink,u_shape5_size_secondary* shrink),.05 * shrink)))), s.rgb, u_shape5_color.rgb, u_shape5_smoothness*shrink);
 	
 	// add noise, for visual intrigue
-	s.w -= noise3D(p);
+	float n = surface_noise(p);
+	s.w -= n;
+	s.rgb -= n;
+	
 	return s;
 }
+
+
 
 vec3 get_normal(vec3 p, float time, vec3 world_cam_pos) {
 	float d = get_scene(p, time, world_cam_pos).w;
@@ -459,63 +458,51 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_i3wah"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wkj0x"]
 render_priority = 0
-shader = SubResource("Shader_i6060")
-shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.06444, -4.4692, 27.2545)
-shader_parameter/u_shape5_smoothness = 0.2
-shader_parameter/u_shape5_size = Vector3(2.173, 5, 3.988)
-shader_parameter/u_shape5_rounding = 0.0
-shader_parameter/u_shape5_layer = 1.0
-shader_parameter/u_shape5_color = Color(0.878431, 0.831373, 0.152941, 1)
-shader_parameter/u_shape4_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.73789, -0.517413, 2.03616)
-shader_parameter/u_shape4_smoothness = 0.2
-shader_parameter/u_shape4_size = Vector3(1, 1, 1)
-shader_parameter/u_shape4_rounding = 0.0
-shader_parameter/u_shape4_layer = 0.0
-shader_parameter/u_shape4_color = Color(1, 1, 1, 1)
-shader_parameter/u_shape3_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.0575, 0.673062, 2.83571)
-shader_parameter/u_shape3_smoothness = 0.2
-shader_parameter/u_shape3_radius = 1.0
-shader_parameter/u_shape3_layer = 3.0
-shader_parameter/u_shape3_color = Color(0.87451, 0.172549, 0.0666667, 1)
-shader_parameter/u_shape2_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.87773, -0.00599527, 3.47134)
+shader = SubResource("Shader_6mby5")
+shader_parameter/u_shape3_size_primary = 1.724
+shader_parameter/u_shape3_rounding = 0.2
+shader_parameter/u_shape3_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape3_layer = 1.0
+shader_parameter/u_shape3_generic_shape = 1
+shader_parameter/u_shape3_color = Color(0.282353, 0.431373, 0.231373, 1)
+shader_parameter/u_shape2_transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 19.0866, -0.00168875, 82.6974)
 shader_parameter/u_shape2_smoothness = 0.2
-shader_parameter/u_shape2_radius = 2.15843
-shader_parameter/u_shape2_layer = 2.0
-shader_parameter/u_shape2_color = Color(1, 0.152941, 0.643137, 1)
-shader_parameter/u_shape1_transform = Transform3D(0.920791, -0.390056, -2.5332e-07, 0.352, 0.830954, 0.430826, -0.168046, -0.396701, 0.902435, -3.95913, -0.702027, 0.337018)
+shader_parameter/u_shape2_size_secondary = 530.842
+shader_parameter/u_shape2_size_primary = 80.0
+shader_parameter/u_shape2_rounding = 0.2
+shader_parameter/u_shape2_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape2_layer = 1.0
+shader_parameter/u_shape2_generic_shape = 3
+shader_parameter/u_shape2_color = Color(0.423529, 0.305882, 0.184314, 1)
+shader_parameter/u_shape1_transform = Transform3D(-0.921573, 0.397271, 0, -0.397266, -0.921582, 0, 0, 0, 1.00004, -2.99739, -1.28554, -0.464716)
 shader_parameter/u_shape1_smoothness = 0.2
-shader_parameter/u_shape8_transform = Transform3D(0.611237, -0.791448, 0, 0.791448, 0.611237, 0, 0, 0, 1, 1.24141, -0.729916, 0.00168514)
-shader_parameter/u_shape8_smoothness = 0.2
-shader_parameter/u_shape8_size_secondary = 0.37
-shader_parameter/u_shape8_size_primary = 0.527234
-shader_parameter/u_shape8_rounding = -0.16
-shader_parameter/u_shape8_offset = Vector3(0, 1.352, 0)
-shader_parameter/u_shape8_layer = 1.0
-shader_parameter/u_shape8_generic_shape = 4
-shader_parameter/u_shape8_color = Color(1, 0.32549, 0.113725, 1)
-shader_parameter/u_shape7_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.74593, -0.0218525, 0.879131)
-shader_parameter/u_shape7_smoothness = 0.2
-shader_parameter/u_shape7_size_secondary = 0.652952
-shader_parameter/u_shape7_size_primary = 1.14535
-shader_parameter/u_shape7_rounding = 0.2
-shader_parameter/u_shape7_offset = Vector3(0.5, 0.5, 0.8)
-shader_parameter/u_shape7_layer = 1.0
-shader_parameter/u_shape7_generic_shape = 1
-shader_parameter/u_shape7_color = Color(0.52549, 0.533333, 1, 1)
-shader_parameter/u_shape6_transform = Transform3D(0.409923, -0.91212, 0, 0.912119, 0.409923, 0, 0, 0, 1, 0.526244, -0.236555, 0.00168514)
-shader_parameter/u_shape6_thickness = 0.505737
-shader_parameter/u_shape6_smoothness = 0.2
-shader_parameter/u_shape6_radius = 3.87791
-shader_parameter/u_shape6_layer = 2.0
-shader_parameter/u_shape6_color = Color(0.356863, 0.305882, 0.54902, 1)
-shader_parameter/u_shape1001_size_primary = 0.0
-shader_parameter/u_shape1001_rounding = 0.0
-shader_parameter/u_shape1001_offset = Vector3(0, 0, 0)
-shader_parameter/u_shape1001_layer = 1.0
-shader_parameter/u_shape1001_generic_shape = 1
-shader_parameter/u_shape1001_color = Color(1, 1, 1, 1)
+shader_parameter/u_shape1_size_secondary = 0.37
+shader_parameter/u_shape1_size_primary = 1.05
+shader_parameter/u_shape1_rounding = -0.16
+shader_parameter/u_shape1_offset = Vector3(0, 3.814, 0)
+shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.72922, -2.29855, 9.61027)
+shader_parameter/u_shape5_smoothness = 0.2
+shader_parameter/u_shape5_size_secondary = 2.66551
+shader_parameter/u_shape5_size_primary = 3.032
+shader_parameter/u_shape5_rounding = 0.2
+shader_parameter/u_shape5_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape5_layer = 1.0
+shader_parameter/u_shape5_generic_shape = 0
+shader_parameter/u_shape5_color = Color(0.760784, 0.694118, 0.431373, 1)
+shader_parameter/u_shape4_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.48519, 2.994, 11.7976)
+shader_parameter/u_shape4_smoothness = 0.2
+shader_parameter/u_shape4_size_secondary = 2.657
+shader_parameter/u_shape4_size_primary = 7.57
+shader_parameter/u_shape4_rounding = 0.2
+shader_parameter/u_shape4_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape4_layer = 1.0
+shader_parameter/u_shape4_generic_shape = 0
+shader_parameter/u_shape4_color = Color(0.662745, 0.192157, 0.6, 1)
+shader_parameter/u_shape3_transform = Transform3D(0.458756, -0.189921, -0.868162, 0.42102, 0.907055, 0.0240453, 0.782442, -0.376339, 0.496119, -10.2082, -1.03773, -4.5222)
+shader_parameter/u_shape3_smoothness = 0.2
+shader_parameter/u_shape3_size_secondary = 6.26073
 shader_parameter/u_shape1000_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
 shader_parameter/u_shape1000_smoothness = 0.2
 shader_parameter/u_shape1000_size_secondary = 3.0
@@ -525,27 +512,20 @@ shader_parameter/u_shape1000_offset = Vector3(0, 0, 0)
 shader_parameter/u_shape1000_layer = 1.0
 shader_parameter/u_shape1000_generic_shape = 1
 shader_parameter/u_shape1000_color = Color(1, 1, 1, 1)
-shader_parameter/u_shape0_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.67589, 0.178367, 8.35921)
+shader_parameter/u_shape0_transform = Transform3D(0.5, -0.866026, 0, 0.866026, 0.5, 0, 0, 0, 1, 0.785919, 1.34926, 0.19669)
 shader_parameter/u_shape0_smoothness = 0.2
-shader_parameter/u_shape0_size = Vector3(6.06672, 4.75508, 4.02295)
-shader_parameter/u_shape0_rounding = 0.0
-shader_parameter/u_shape0_layer = 0.0
-shader_parameter/u_shape0_color = Color(0, 0.203922, 1, 1)
+shader_parameter/u_shape0_size_secondary = 0.516588
+shader_parameter/u_shape0_size_primary = 3.6582
+shader_parameter/u_shape0_rounding = 0.2
+shader_parameter/u_shape0_offset = Vector3(0.5, 0.5, 0.8)
+shader_parameter/u_shape0_layer = 1.0
+shader_parameter/u_shape0_generic_shape = 2
+shader_parameter/u_shape0_color = Color(0.341176, 0.345098, 0.647059, 1)
 shader_parameter/shrink = 1.0
 shader_parameter/fog_color = null
-shader_parameter/u_shape1_size = Vector3(3.93457, 0.267678, 12.1113)
-shader_parameter/u_shape1_rounding = 0.0
 shader_parameter/u_shape1_layer = 1.0
-shader_parameter/u_shape1_color = Color(0.0431373, 1, 0.329412, 1)
-shader_parameter/u_shape1003_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
-shader_parameter/u_shape1003_smoothness = 0.2
-shader_parameter/u_shape1003_size_secondary = 0.0
-shader_parameter/u_shape1003_size_primary = 0.0
-shader_parameter/u_shape1003_rounding = 0.0
-shader_parameter/u_shape1003_offset = Vector3(0, 0, 0)
-shader_parameter/u_shape1003_layer = 1.0
-shader_parameter/u_shape1003_generic_shape = 1
-shader_parameter/u_shape1003_color = Color(1, 1, 1, 1)
+shader_parameter/u_shape1_generic_shape = 4
+shader_parameter/u_shape1_color = Color(1, 0.32549, 0.113725, 1)
 shader_parameter/u_shape1002_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
 shader_parameter/u_shape1002_smoothness = 0.2
 shader_parameter/u_shape1002_size_secondary = 0.0
@@ -558,8 +538,14 @@ shader_parameter/u_shape1002_color = Color(1, 1, 1, 1)
 shader_parameter/u_shape1001_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
 shader_parameter/u_shape1001_smoothness = 0.2
 shader_parameter/u_shape1001_size_secondary = 0.0
+shader_parameter/u_shape1001_size_primary = 0.0
+shader_parameter/u_shape1001_rounding = 0.0
+shader_parameter/u_shape1001_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape1001_layer = 1.0
+shader_parameter/u_shape1001_generic_shape = 1
+shader_parameter/u_shape1001_color = Color(1, 1, 1, 1)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_5veb8"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_hptgg"]
 flip_faces = true
 orientation = 2
 
@@ -610,9 +596,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_i3wah")
+material_override = SubResource("ShaderMaterial_wkj0x")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_5veb8")
+mesh = SubResource("PlaneMesh_hptgg")
 script = ExtResource("2_vw6ij")
 
 [node name="Cutaway1" type="Node3D" parent="SDFContainer"]
@@ -642,109 +628,80 @@ g_shape = 1
 operation = 3
 layer = 1.0
 
-[node name="Cutaway4" type="Node3D" parent="SDFContainer"]
+[node name="Torus" type="Node3D" parent="SDFContainer"]
+transform = Transform3D(0.5, 0.866025, 0, -0.866025, 0.5, 0, 0, 0, 1, -1.5615, 0, -0.195005)
 script = ExtResource("7_vvng6")
-size_primary = 0.0
-size_secondary = 0.0
-rounding = 0.0
-g_shape = 1
-operation = 3
-layer = 1.0
-
-[node name="big blue" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.67584, -0.184362, -8.35753)
-script = ExtResource("3_bighi")
-size = Vector3(6.06672, 4.75508, 4.02295)
-rounding = 0.0
-operation = 0
-color = Color(0, 0.203922, 1, 1)
-layer = 0.0
-
-[node name="green plate" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(0.920791, 0.352, -0.168046, -0.390056, 0.830954, -0.396701, 0, 0.430826, 0.902435, 3.94923, -0.83323, 0)
-script = ExtResource("3_bighi")
-size = Vector3(3.93457, 0.267678, 12.1113)
-rounding = 0.0
-operation = 0
-color = Color(0.0431373, 1, 0.329412, 1)
-layer = 1.0
-
-[node name="SDF_Manip" parent="SDFContainer/green plate" instance=ExtResource("4_et84q")]
-spin_axis = Vector3(0, 0, 1)
-
-[node name="Pinkball" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.87768, 0, -3.46965)
-script = ExtResource("5_co4p6")
-radius = 2.15843
-operation = 0
-color = Color(1, 0.152941, 0.643137, 1)
-layer = 2.0
-
-[node name="red ball" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.05745, -0.679057, -2.83402)
-script = ExtResource("5_co4p6")
-radius = 1.0
-operation = 0
-color = Color(0.87451, 0.172549, 0.0666667, 1)
-layer = 3.0
-
-[node name="white cube" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.73794, 0.511418, -2.03447)
-script = ExtResource("3_bighi")
-size = Vector3(1, 1, 1)
-rounding = 0.0
-operation = 0
-layer = 0.0
-
-[node name="yellow cube" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.06449, 4.4632, -27.2528)
-script = ExtResource("3_bighi")
-size = Vector3(2.173, 5, 3.988)
-rounding = 0.0
-operation = 0
-color = Color(0.878431, 0.831373, 0.152941, 1)
-layer = 1.0
-
-[node name="SDFTorus" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(0.409923, 0.912121, 0, -0.91212, 0.409923, 0, 0, 0, 1, 0, 0.570972, 0)
-script = ExtResource("6_ragbq")
-radius = 3.87791
-thickness = 0.505737
-operation = 0
-color = Color(0.356863, 0.305882, 0.54902, 1)
-layer = 2.0
-
-[node name="SDFGeneric" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.74598, 0.0158572, -0.877446)
-script = ExtResource("7_vvng6")
-size_primary = 1.14535
-size_secondary = 0.652952
+size_primary = 3.6582
+size_secondary = 0.516588
 rounding = 0.2
 offset = Vector3(0.5, 0.5, 0.8)
-g_shape = 1
+g_shape = 2
+osc_z = true
+MAX_OSC = 0.3
 operation = 0
-color = Color(0.52549, 0.533333, 1, 1)
+color = Color(0.341176, 0.345098, 0.647059, 1)
 layer = 1.0
 
-[node name="SDF_Manip2" type="Node" parent="SDFContainer/SDFGeneric"]
-script = ExtResource("4_0ln3o")
-osc_z = true
-MAX_OSC = 1.4
-
 [node name="red-cone" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(0.611237, 0.791448, 0, -0.791448, 0.611237, 0, 0, 0, 1, -0.181154, 1.42267, 0)
+transform = Transform3D(-0.91506, -0.394459, 0, 0.394455, -0.915051, 0, 0, 0, 0.999957, -3.24993, 0, 0.466381)
 script = ExtResource("7_vvng6")
-size_primary = 0.527234
+size_primary = 1.05
 size_secondary = 0.37
 rounding = -0.16
-offset = Vector3(0, 1.352, 0)
+offset = Vector3(0, 3.814, 0)
 g_shape = 4
+spin_speed = 0.58
+spin_axis = Vector3(0, 0, 1)
 operation = 0
 color = Color(1, 0.32549, 0.113725, 1)
 layer = 1.0
 
-[node name="SDF_Manip" parent="SDFContainer/red-cone" instance=ExtResource("4_et84q")]
-spin_axis = Vector3(0, 0, 2)
+[node name="SDFGeneric" type="Node3D" parent="SDFContainer"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -19.0866, -82.7034, 0)
+script = ExtResource("7_vvng6")
+size_primary = 80.0
+size_secondary = 530.842
+rounding = 0.2
+g_shape = 3
+operation = 0
+color = Color(0.423529, 0.305882, 0.184314, 1)
+layer = 1.0
+
+[node name="greenbox" type="Node3D" parent="SDFContainer"]
+transform = Transform3D(0.458873, 0.420779, 0.782592, -0.189986, 0.906522, -0.376394, -0.867818, 0.0240359, 0.49588, 8.65992, -2.70682, -6.58978)
+script = ExtResource("7_vvng6")
+size_primary = 1.724
+size_secondary = 6.26073
+rounding = 0.2
+g_shape = 1
+MAX_OSC = 0.1
+spin_speed = 0.46
+spin_axis = Vector3(0, 1, 0)
+operation = 0
+color = Color(0.282353, 0.431373, 0.231373, 1)
+layer = 1.0
+
+[node name="pinkglobe" type="Node3D" parent="SDFContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.48514, -3, -11.7959)
+script = ExtResource("7_vvng6")
+size_primary = 7.57
+size_secondary = 2.657
+rounding = 0.2
+operation = 0
+color = Color(0.662745, 0.192157, 0.6, 1)
+layer = 1.0
+
+[node name="yellowball" type="Node3D" parent="SDFContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.72927, 2.29255, -9.60859)
+script = ExtResource("7_vvng6")
+size_primary = 3.032
+size_secondary = 2.66551
+rounding = 0.2
+osc_z = true
+MAX_OSC = 1.1
+operation = 0
+color = Color(0.760784, 0.694118, 0.431373, 1)
+layer = 1.0
 
 [node name="DirectionalLight3d" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.111727, -0.0785847, 0.990627, 0.0413513, 0.995637, 0.0836459, -0.992878, 0.0503092, -0.10799, 0, 3.2076, 7.80617)

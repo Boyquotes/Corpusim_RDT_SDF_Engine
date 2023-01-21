@@ -13,7 +13,6 @@ extends Node
 	set(a):
 		spin_axis = a.normalized()
 
-
 @onready var start_pos : Vector3 = manip.position
 
 
@@ -24,7 +23,6 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	#manip.rotate_(delta*.5)
 	if spin_axis != Vector3(0,0,0):
 		manip.rotate_object_local(spin_axis,delta*.5)
 	if osc_z:

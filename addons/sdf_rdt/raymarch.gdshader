@@ -130,9 +130,9 @@ float surface_noise(in vec3 p){
 	//f = 0.5*noise3D( f ); p = p*2.05;
     //f += 0.25*simplex3D( f ); p = p*2.1;
 	//f = noise3D(0.5*p/shrink)*.03*shrink; p = p*15.3;
-	f = smoothstep(0.,.3,noise3D(0.2*p/shrink))*.1*shrink;
+	f = smoothstep(0.,.3,noise3D(TIME*.09+0.2*p/shrink))*.13*shrink;
 	p = p*2.3;
-	f += noise3D(p/shrink)*.02*shrink;
+	f += noise3D(TIME*.14+p/shrink)*.04*shrink;
 	return f;
 }
 
@@ -205,10 +205,13 @@ float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, floa
 			break;
 			//float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
 		case ROUNDED_BOX:
-			d = get_rounded_box(p,vec3(size1),rounding);
+			d = get_rounded_box(p,vec3(size1,size2,size1),rounding);
 			break;
 		case CYLINDER:
 			d = get_rounded_cylinder(p, size1, rounding, size2);
+			break;
+		case TORUS:
+			d = get_torus(p, vec2(size1,size2) );
 			break;
 		default:
 		    d = get_sphere(p,offset,size2);
@@ -285,8 +288,9 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	//</scene>
 	
 	// add noise, for visual intrigue
-	//s.w -= surface_noise(p);
-	s -= surface_noise(p);
+	float n = surface_noise(p);
+	s.w -= n;
+	s.rgb -= n;
 	
 	return s;
 }

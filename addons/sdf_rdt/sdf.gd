@@ -97,7 +97,7 @@ class SceneObject:
 			SHAPE_GENERIC:
 				params[PARAM_SIZE_PRIMARY] = Param.new(3.0)
 				params[PARAM_SIZE_SECONDARY] = Param.new(3.0)
-				params[PARAM_GENERIC_SHAPE] = Param.new(1)
+				params[PARAM_GENERIC_SHAPE] = Param.new(0) 
 				params[PARAM_ROUNDING] = Param.new(0.2)
 				params[PARAM_OFFSET] = Param.new(Vector3(0,0,0))
 				

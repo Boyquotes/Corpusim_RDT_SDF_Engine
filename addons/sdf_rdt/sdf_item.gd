@@ -52,6 +52,8 @@ func _process(delta):
 		set_position(probe.position / probe.shrink)
 		set_rotation(probe.rotation)
 		
+	
+		
 func _set_param(param_index: int, value):
 	var param : Variant = _data.params[param_index]
 	if _container != null:
