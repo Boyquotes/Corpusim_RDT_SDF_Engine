@@ -27,6 +27,20 @@ extends "./sdf_item.gd"
 	set(o):
 		offset = o # Useless but doing it anyways
 		_set_param(SDF.PARAM_OFFSET, o)
+		
+@export_range(0.0,1.0,1.0) var onion_alpha : float = 0.0:
+	get:
+		return _data.params[SDF.PARAM_ONION_ALPHA].value
+	set(o):
+		onion_alpha = o
+		_set_param(SDF.PARAM_ONION_ALPHA,o)
+	
+@export var onion_thickness : float = 1.0:
+	get:
+		return _data.params[SDF.PARAM_ONION_THICKNESS].value
+	set(t):
+		onion_thickness = t
+		_set_param(SDF.PARAM_ONION_THICKNESS, t)
 
 @export_enum("Sphere", "Box", "Torus", "Cylinder", "Rounded Cone", "Plane") var g_shape:int = SDF.G_SPHERE:
 	get:

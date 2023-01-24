@@ -26,6 +26,8 @@ const PARAM_SIZE_PRIMARY = 9
 const PARAM_SIZE_SECONDARY = 10
 const PARAM_GENERIC_SHAPE = 11
 const PARAM_OFFSET = 12
+const PARAM_ONION_ALPHA = 13
+const PARAM_ONION_THICKNESS = 14
 
 const G_SPHERE = 0
 const G_BOX = 1
@@ -49,7 +51,9 @@ const _param_names = [
 	"size_primary",
 	"size_secondary",
 	"generic_shape",
-	"offset"
+	"offset",
+	"onion_alpha",
+	"onion_thickness"
 ]
 
 const _param_types = [
@@ -65,7 +69,9 @@ const _param_types = [
 	TYPE_FLOAT,
 	TYPE_FLOAT,
 	TYPE_INT,
-	TYPE_VECTOR3
+	TYPE_VECTOR3,
+	TYPE_FLOAT,
+	TYPE_FLOAT
 ]
 
 class Param:
@@ -100,6 +106,8 @@ class SceneObject:
 				params[PARAM_GENERIC_SHAPE] = Param.new(0) 
 				params[PARAM_ROUNDING] = Param.new(0.2)
 				params[PARAM_OFFSET] = Param.new(Vector3(0,0,0))
+				params[PARAM_ONION_ALPHA] = Param.new(0.0)
+				params[PARAM_ONION_THICKNESS] = Param.new(1.0)
 				
 			SHAPE_SPHERE:
 				params[PARAM_RADIUS] = Param.new(1.0)

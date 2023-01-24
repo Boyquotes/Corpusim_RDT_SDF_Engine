@@ -201,6 +201,8 @@ static func _godot_type_to_shader_type(type: int):
 			return "vec3"
 		TYPE_INT:
 			return "int"
+		TYPE_BOOL:
+			return "bool"
 		_:
 			assert(false)
 
@@ -299,7 +301,9 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var shape_code : String = _get_shape_code(obj, pos_code)#+displace_code
 		
 		# onion everything
-		shape_code  = str("opOnion(", shape_code, ",.05 * shrink)")
+		var onioned_shape_code  = str("opOnion(", shape_code, ",.05 * shrink)")
+		shape_code = str( "mix(",shape_code,",",onioned_shape_code,",",_get_param_code(obj, SDF.PARAM_ONION_ALPHA),")" )
+		
 		
 		# Cutaways
 		for cutaway_index in len(cutaways):
