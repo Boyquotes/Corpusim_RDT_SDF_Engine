@@ -268,7 +268,7 @@ vec3 repeat_domain(vec3 p, vec3 c, vec3 l) {
 
 float opOnion( in float sdf, in float thickness )
 {
-    return abs(sdf)-thickness;
+    return abs(sdf+thickness)-thickness;
 }
 
 //<functions>
