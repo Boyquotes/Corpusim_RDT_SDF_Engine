@@ -43,7 +43,7 @@ var cutaway_normalized_size : float = CUTAWAY_SIZE_SPHERE
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	hud.get_node("msg").text = "Shrink: %0.3f" % shrink 
+	hud.get_node("VBoxContainer/msg").text = "Shrink: %0.3f" % shrink 
 	shrink1_pos = position
 	_init_cutaways()
 	_reset_cutaways()
@@ -59,11 +59,9 @@ func _init_cutaways():
 		
 	# alias: writes to cutaways[0]
 	probe_cut = cutaways[0]
-	
+
 	probe_cut.g_shape = SDF.G_SPHERE
 	probe_cut.follows_probe = true
-	print("probe cut: ", probe_cut)
-	print("follows: ", probe_cut.follows_probe)
 	cutaway_index = 1
 	
 
@@ -106,7 +104,7 @@ func _process_shrink():
 		_calibrate_cutaway_shrink()
 		sdf_container.calibrate_shrink(shrink)
 		hierarch.set_shrink(shrink)
-		hud.get_node("msg").text = "Shrink: %0.3f" % shrink 
+		hud.get_node("VBoxContainer/msg").text = "Shrink: %0.3f" % shrink 
 		position = shrink1_pos*shrink			
 
 func _input(event):
@@ -183,8 +181,10 @@ func _place_cutaway():
 		cutaways[cutaway_index].g_shape = probe_cut.g_shape
 		cutaways[cutaway_index].rounding = probe_cut.rounding
 		cutaway_index += 1
-	else:
-		print("Max Cutaways Placed. Right Mouse Button to Reset Cutaways.")
+		
+		var cut_shape_string
+		hud.set_cut(cutaway_index,probe_cut.g_shape)
+	
 	
 
 func _reset_cutaways():
@@ -195,7 +195,8 @@ func _reset_cutaways():
 		cutaways[i+1].g_shape = SDF.G_SPHERE
 		
 	cutaway_index = 1
-		
+	
+	hud.reset_cuts(probe_cut.g_shape)
 		
 	
 
@@ -210,21 +211,22 @@ func _change_cutaway_shape():
 			probe_cut.g_shape = SDF.G_SPHERE
 			probe_cut.size_primary = CUTAWAY_SIZE_SPHERE
 			cutaway_normalized_size = CUTAWAY_SIZE_SPHERE
-			print("Sphere Cutaway")
+			hud.set_cut(cutaway_index,SDF.G_SPHERE)
 		1:
 			probe_cut.g_shape = SDF.G_PLANE
 			probe_cut.size_primary = CUTAWAY_SIZE_PLANE
 			cutaway_normalized_size = CUTAWAY_SIZE_PLANE
-			print("Plane Cutaway")
+			hud.set_cut(cutaway_index,SDF.G_PLANE)
 		2:
 			probe_cut.g_shape = SDF.G_BOX
 			probe_cut.size_primary = CUTAWAY_SIZE_BOX
 			cutaway_normalized_size = CUTAWAY_SIZE_BOX
-			print("Box Cutaway")
+			hud.set_cut(cutaway_index,SDF.G_BOX)
 		_: 
 			probe_cut.g_shape = SDF.G_SPHERE
 			probe_cut.size_primary = CUTAWAY_SIZE_SPHERE
 			cutaway_normalized_size = CUTAWAY_SIZE_SPHERE
+			hud.set_cut(cutaway_index,SDF.G_SPHERE)
 			print("Misconfigured # of cutaway shapes in Player.gd")
 			
 	_calibrate_cutaway_shrink()

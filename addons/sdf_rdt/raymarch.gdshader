@@ -127,12 +127,9 @@ float noise3D(vec3 p)
 // TODO: employ tf uniforms to rotate noise with object
 float surface_noise(in vec3 p){
 	float f;
-	//f = 0.5*noise3D( f ); p = p*2.05;
-    //f += 0.25*simplex3D( f ); p = p*2.1;
-	//f = noise3D(0.5*p/shrink)*.03*shrink; p = p*15.3;
-	f = smoothstep(0.,.3,noise3D(TIME*.09+0.2*p/shrink))*.13*shrink;
+	f = smoothstep(0.,.3,noise3D( TIME*.09 +0.2*p/shrink))*.13;
 	p = p*2.3;
-	f += noise3D(TIME*.14+p/shrink)*.04*shrink;
+	f += noise3D(TIME*.14+p/shrink)*.04;
 	return f;
 }
 
@@ -289,8 +286,8 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	
 	// add noise, for visual intrigue
 	float n = surface_noise(p);
-	s.w -= n;
-	s.rgb -= n;
+	s.w -= n * shrink;
+	s.rgb += n;
 	
 	return s;
 }

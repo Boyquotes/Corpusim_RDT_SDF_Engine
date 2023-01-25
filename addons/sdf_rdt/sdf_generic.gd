@@ -1,6 +1,9 @@
 @tool
 extends "./sdf_item.gd"
 
+@onready var hierarch = get_node("/root/Node3d/Hierarch")
+var start_pos : Vector3
+@onready var shrink : float = 1.0
 
 @export var size_primary: float :
 	get:
@@ -63,18 +66,23 @@ extends "./sdf_item.gd"
 	set(a):
 		spin_axis = a.normalized()
 
-var start_pos : Vector3
 
 func _init():
 	_data = SDF.SceneObject.new(SDF.SHAPE_GENERIC)
 	set_notify_transform(true) 
-
-
+	
+	
+func _ready():
+	hierarch.connect("shrink_modified", _shrink_modified)
+	
 
 func _process(delta):
 	super(delta)
 	if spin_speed > 0.0 && spin_axis != null && spin_axis != Vector3(0,0,0):
-		rotate_object_local(spin_axis,delta*spin_speed)
+		rotate_object_local(spin_axis,delta*spin_speed / shrink)
 	if osc_z:
 		var offset = MAX_OSC * sin(.001*Time.get_ticks_msec())
 		position = start_pos + Vector3(0,0,offset)
+
+func _shrink_modified(s):
+	shrink = s
