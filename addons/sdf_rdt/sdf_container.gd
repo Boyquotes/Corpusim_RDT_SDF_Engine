@@ -231,7 +231,7 @@ static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> Stri
 				pos_code, ",",_get_param_code(obj, SDF.PARAM_OFFSET), "* shrink,",
 				_get_param_code(obj, SDF.PARAM_ROUNDING)," * shrink,",
 				_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY),"* shrink,",
-				_get_param_code(obj, SDF.PARAM_SIZE_SECONDARY),"* shrink)")
+				_get_param_code(obj, SDF.PARAM_SIZE_SECONDARY),"* shrink,n)")
 					
 		SDF.SHAPE_SPHERE:
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
@@ -295,7 +295,7 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 			# for debug
 			#fcount += _godot_type_to_fcount(type)
 
-		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), " * vec4(p, shrink)).xyz")
+		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), "  * vec4(p, shrink)).xyz")
 		var indent = "\t"
 		
 		var shape_code : String = _get_shape_code(obj, pos_code)#+displace_code

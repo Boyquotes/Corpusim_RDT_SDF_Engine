@@ -23,6 +23,7 @@ const int ROUNDED_CONE = 4;
 const int PLANE = 5;
 
 
+
 void vertex() {
 	POSITION = vec4(VERTEX, 1.0);
 }
@@ -188,11 +189,12 @@ float sdPlane( vec3 p, vec3 n, float h )
   return dot(p,n) + h;
 }
 
-float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2 ){
+float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2, vec2 noise ){
 	float d = 0.;
 	switch (shape_sel){
 		case SPHERE:
 		    d = get_sphere(p,offset,size1);
+			d -= noise.y * .04;
 			break;
 		case PLANE:
 			d = sdPlane(p, vec3(0,0,-1), size1);
@@ -206,6 +208,8 @@ float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, floa
 			break;
 		case CYLINDER:
 			d = get_rounded_cylinder(p, size1, rounding, size2);
+			d -= noise.x*.04;
+			d -= smoothstep(0.,3.,noise.y)*.13;
 			break;
 		case TORUS:
 			d = get_torus(p, vec2(size1,size2) );
@@ -274,6 +278,10 @@ float opOnion( in float sdf, in float thickness )
 vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	vec4 s = vec4(1.0, 1.0, 1.0, 99999.0);
 	
+	vec2 n = vec2(noise3D(TIME*.09+.02*p/shrink),
+					noise3D(TIME*.14+p*2.3/shrink) );
+	
+//	f = smoothstep(0.,.3,noise3D( TIME*.09 +0.2*p/shrink))*.13;
 	
 	//<scene>
 	s.w = sharp_union(s.w, get_sphere(p, vec3(0.0), 1.0));
@@ -285,9 +293,9 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	//</scene>
 	
 	// add noise, for visual intrigue
-	float n = surface_noise(p);
-	s.w -= n * shrink;
-	s.rgb += n;
+	//float n = surface_noise(p);
+	//s.w -= n * shrink;
+	//s.rgb += n;
 	
 	return s;
 }
@@ -345,6 +353,7 @@ void fragment() {
 	float d = rm.w;
 	
 	if (d > MAX_DISTANCE * shrink) {
+		// TODO: render background shader
 		discard;
 	}
 
@@ -356,12 +365,6 @@ void fragment() {
 	
 	NORMAL = (VIEW_MATRIX * vec4(normal, 0.0)).xyz;
 	
-	//ALBEDO = ray_dir * 0.1;
-	//ALBEDO = rm.rgb;
 	ALBEDO = mix(rm.rgb, fog_color, clamp(0.,1.,DEPTH * 100. - 99.));
-	//ALBEDO = vec3(depth);
-	//ALBEDO = normal;
-	/*if(d > 0.0) {
-		ALBEDO = vec3(0.0, 1.0, 0.0);
-	}*/
+	
 }
