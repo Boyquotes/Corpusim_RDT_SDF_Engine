@@ -2,10 +2,11 @@ extends Control
 
 
 @onready var hud_cuts = []
-var cut_tex_empty : Texture2D = preload("res://addons/sdf_rdt/tools/icons/icon_cut_empty.svg")
-var cut_tex_sphere : Texture2D = preload("res://addons/sdf_rdt/tools/icons/icon_cut_sphere.svg")
-var cut_tex_cube : Texture2D = preload("res://addons/sdf_rdt/tools/icons/icon_cut_cube.svg")
-var cut_tex_plane : Texture2D = preload("res://addons/sdf_rdt/tools/icons/icon_cut_plane.svg")
+#TODO load --> preload
+var cut_tex_empty : Texture2D = load("res://addons/sdf_rdt/tools/icons/icon_cut_empty.svg")
+var cut_tex_sphere : Texture2D = load("res://addons/sdf_rdt/tools/icons/icon_cut_sphere.svg")
+var cut_tex_cube : Texture2D = load("res://addons/sdf_rdt/tools/icons/icon_cut_cube.svg")
+var cut_tex_plane : Texture2D = load("res://addons/sdf_rdt/tools/icons/icon_cut_plane.svg")
 
 const SDF = preload("res://addons/sdf_rdt/sdf.gd")
 

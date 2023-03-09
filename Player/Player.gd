@@ -11,7 +11,7 @@ const SDFGeneric = preload("res://addons/sdf_rdt/sdf_generic.gd")
 
 @onready var sdf_container : SDFContainer = $"%SDFContainer"
 @onready var hierarch = $"%Hierarch"
-@onready var hud = $"../HUD"
+@onready var hud = $"%HUD"
 
 const SHRINK_MIN : float = 1.0
 const SHRINK_MAX : float = 50.0

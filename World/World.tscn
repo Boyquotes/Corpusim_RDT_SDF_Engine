@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="8_eob7v"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="9_7c4ph"]
 
-[sub_resource type="Shader" id="Shader_u03x4"]
+[sub_resource type="Shader" id="Shader_mmc3l"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -485,9 +485,9 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_362kc"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cuytw"]
 render_priority = 0
-shader = SubResource("Shader_u03x4")
+shader = SubResource("Shader_mmc3l")
 shader_parameter/u_shape3_rounding = 0.2
 shader_parameter/u_shape3_onion_thickness = 0.251
 shader_parameter/u_shape3_onion_alpha = 1.0
@@ -506,14 +506,14 @@ shader_parameter/u_shape2_offset = Vector3(0, 0, 0)
 shader_parameter/u_shape2_layer = 1.0
 shader_parameter/u_shape2_generic_shape = 3
 shader_parameter/u_shape2_color = Color(0.423529, 0.305882, 0.184314, 1)
-shader_parameter/u_shape1_transform = Transform3D(-0.584802, -0.816233, 0, 0.81617, -0.584825, 0, 0, 0, 1.00004, -1.89564, 2.65596, -0.464716)
+shader_parameter/u_shape1_transform = Transform3D(-0.676412, -0.74235, 0, 0.742291, -0.676439, 0, 0, 0, 1.00004, -2.19381, 2.41642, -0.464716)
 shader_parameter/u_shape1_smoothness = 0.2
 shader_parameter/u_shape1_size_secondary = 0.37
 shader_parameter/u_shape1_size_primary = 1.05
 shader_parameter/u_shape1_rounding = -0.16
 shader_parameter/u_shape1_onion_thickness = 0.0
 shader_parameter/u_shape1_onion_alpha = 0.0
-shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.72922, -2.29855, 10.7927)
+shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.72922, -2.29855, 11.6172)
 shader_parameter/u_shape5_smoothness = 0.2
 shader_parameter/u_shape5_size_secondary = 2.66551
 shader_parameter/u_shape5_size_primary = 3.032
@@ -535,7 +535,7 @@ shader_parameter/u_shape4_offset = Vector3(0, 0, 0)
 shader_parameter/u_shape4_layer = 1.0
 shader_parameter/u_shape4_generic_shape = 0
 shader_parameter/u_shape4_color = Color(0.662745, 0.192157, 0.6, 1)
-shader_parameter/u_shape3_transform = Transform3D(0.619954, -0.268268, -0.735263, 0.421004, 0.907063, 0.0240462, 0.659774, -0.32416, 0.675601, -10.9398, -1.03756, -2.13592)
+shader_parameter/u_shape3_transform = Transform3D(-0.272351, 0.101083, 0.955472, 0.421011, 0.90706, 0.02405, -0.863245, 0.408374, -0.289768, 8.92952, -1.03761, 6.66863)
 shader_parameter/u_shape3_smoothness = 0.2
 shader_parameter/u_shape3_size_secondary = 6.26073
 shader_parameter/u_shape3_size_primary = 1.724
@@ -550,7 +550,7 @@ shader_parameter/u_shape1000_offset = Vector3(0, 0, 0)
 shader_parameter/u_shape1000_layer = 1.0
 shader_parameter/u_shape1000_generic_shape = 1
 shader_parameter/u_shape1000_color = Color(1, 1, 1, 1)
-shader_parameter/u_shape0_transform = Transform3D(0.5, -0.866026, 0, 0.866026, 0.5, 0, 0, 0, 1, 0.785919, 1.34926, 0.518922)
+shader_parameter/u_shape0_transform = Transform3D(0.5, -0.866026, 0, 0.866026, 0.5, 0, 0, 0, 1, 0.785919, 1.34926, 0.743782)
 shader_parameter/u_shape0_smoothness = 0.2
 shader_parameter/u_shape0_size_secondary = 0.516588
 shader_parameter/u_shape0_size_primary = 3.6582
@@ -590,7 +590,7 @@ shader_parameter/u_shape1001_layer = 1.0
 shader_parameter/u_shape1001_generic_shape = 1
 shader_parameter/u_shape1001_color = Color(1, 1, 1, 1)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_piimx"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_7nh3s"]
 flip_faces = true
 orientation = 2
 
@@ -641,9 +641,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_362kc")
+material_override = SubResource("ShaderMaterial_cuytw")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_piimx")
+mesh = SubResource("PlaneMesh_7nh3s")
 script = ExtResource("2_vw6ij")
 
 [node name="Cutaway1" type="Node3D" parent="SDFContainer"]
@@ -677,7 +677,7 @@ operation = 3
 layer = 1.0
 
 [node name="Torus" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(0.5, 0.866025, 0, -0.866025, 0.5, 0, 0, 0, 1, -1.5615, 0, -0.517236)
+transform = Transform3D(0.5, 0.866025, 0, -0.866025, 0.5, 0, 0, 0, 1, -1.5615, 0, -0.742096)
 script = ExtResource("7_vvng6")
 size_primary = 3.6582
 size_secondary = 0.516588
@@ -692,7 +692,7 @@ color = Color(0.341176, 0.345098, 0.647059, 1)
 layer = 1.0
 
 [node name="red-cone" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(-0.580073, 0.809602, 0, -0.809538, -0.58005, 0, 0, 0, 0.999957, -3.24993, 0, 0.466381)
+transform = Transform3D(-0.670677, 0.736026, 0, -0.735968, -0.67065, 0, 0, 0, 0.999957, -3.24993, 0, 0.466381)
 script = ExtResource("7_vvng6")
 size_primary = 1.05
 size_secondary = 0.37
@@ -719,7 +719,7 @@ color = Color(0.423529, 0.305882, 0.184314, 1)
 layer = 1.0
 
 [node name="greenbox" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(0.622374, 0.420779, 0.662359, -0.26933, 0.906522, -0.325379, -0.737021, 0.0240359, 0.677201, 8.65992, -2.70682, -6.58978)
+transform = Transform3D(-0.273502, 0.420779, -0.866913, 0.101548, 0.906522, 0.410079, 0.9579, 0.0240359, -0.290492, 8.65992, -2.70682, -6.58978)
 script = ExtResource("7_vvng6")
 size_primary = 1.724
 size_secondary = 6.26073
@@ -747,7 +747,7 @@ color = Color(0.662745, 0.192157, 0.6, 1)
 layer = 1.0
 
 [node name="yellowball" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.72927, 2.29255, -10.791)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.72927, 2.29255, -11.6155)
 script = ExtResource("7_vvng6")
 size_primary = 3.032
 size_secondary = 2.66551
@@ -770,3 +770,4 @@ camera_attributes = SubResource("CameraAttributesPractical_sdjvp")
 unique_name_in_owner = true
 
 [node name="HUD" parent="." instance=ExtResource("9_7c4ph")]
+unique_name_in_owner = true
