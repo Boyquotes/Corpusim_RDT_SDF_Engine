@@ -23,7 +23,6 @@ const int ROUNDED_CONE = 4;
 const int PLANE = 5;
 
 
-
 void vertex() {
 	POSITION = vec4(VERTEX, 1.0);
 }
@@ -126,12 +125,17 @@ float noise3D(vec3 p)
 }
 
 // TODO: employ tf uniforms to rotate noise with object
-float surface_noise(in vec3 p){
+float surface_noise(vec3 p){
 	float f;
 	f = smoothstep(0.,.3,noise3D( TIME*.09 +0.2*p/shrink))*.13;
 	p = p*2.3;
 	f += noise3D(TIME*.14+p/shrink)*.04;
 	return f;
+}
+
+vec3 get_contrast_color(vec3 col){
+
+	return vec3(1.,1.,0.);
 }
 
 
@@ -168,7 +172,7 @@ float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
   float a2 = l2 - rr*rr;
   float il2 = 1.0/l2;
     
-  // sampling dependant computations
+  // sampling dependent computations
   vec3 pa = p - a;
   float y = dot(pa,ba);
   float z = y - l2;
@@ -189,37 +193,45 @@ float sdPlane( vec3 p, vec3 n, float h )
   return dot(p,n) + h;
 }
 
-float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2, vec2 noise ){
+float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2, vec4 noise, float d_n ){
 	float d = 0.;
+	float n = 0.;
 	switch (shape_sel){
 		case SPHERE:
 		    d = get_sphere(p,offset,size1);
-			d -= noise.y * .04;
+			n -= smoothstep(0.,.1,noise.x) * .2;
+			n -= smoothstep(0.,.3,noise.z)*.08;
 			break;
 		case PLANE:
 			d = sdPlane(p, vec3(0,0,-1), size1);
 			break;
 		case ROUNDED_CONE:
 			d = get_round_cone(p, vec3(0.0), offset,size1,size2);
+			n -= smoothstep(0.,.3,noise.y)*.06;
+			n -= noise.w*.04;
 			break;
 			//float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
 		case ROUNDED_BOX:
 			d = get_rounded_box(p,vec3(size1,size2,size1),rounding);
+			n -= smoothstep(0.,.1,noise.y)*.16;
 			break;
 		case CYLINDER:
 			d = get_rounded_cylinder(p, size1, rounding, size2);
-			d -= noise.x*.04;
-			d -= smoothstep(0.,3.,noise.y)*.13;
+			//d -= smoothstep(0.,.3,noise3D( TIME*.09 +0.2*p/shrink))*.23;
+			//d -= noise3D(TIME*.14+2.3*p/shrink)*.04;
+			n -= smoothstep(.0,.5,noise.x)*.8;
+			n -= noise.z*.08;
 			break;
 		case TORUS:
 			d = get_torus(p, vec2(size1,size2) );
+			n -= noise.w*.1;
 			break;
 		default:
 		    d = get_sphere(p,offset,size2);
 			break;
 	}
 	
-	return d;
+	return mix(d+n,n,d_n);
 }
 
 float sharp_union(float a, float b) {
@@ -278,10 +290,12 @@ float opOnion( in float sdf, in float thickness )
 vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	vec4 s = vec4(1.0, 1.0, 1.0, 99999.0);
 	
-	vec2 n = vec2(noise3D(TIME*.09+.02*p/shrink),
-					noise3D(TIME*.14+p*2.3/shrink) );
+	vec4 n = vec4(noise3D(TIME*.09+p*.2/shrink),
+				  noise3D(TIME*.14+p*.46/shrink),
+				  noise3D(TIME*.04+p*1.05/shrink),
+				  noise3D(TIME*.18+p*2.43/shrink) );
+
 	
-//	f = smoothstep(0.,.3,noise3D( TIME*.09 +0.2*p/shrink))*.13;
 	
 	//<scene>
 	s.w = sharp_union(s.w, get_sphere(p, vec3(0.0), 1.0));
@@ -292,11 +306,7 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	s = smooth_subtract_c(s.w, get_sphere(p, vec3(0.3, 0.0, 1.5), 0.5), s.rgb, vec3(0.0, 1.0, 0.0), 0.1);
 	//</scene>
 	
-	// add noise, for visual intrigue
-	//float n = surface_noise(p);
-	//s.w -= n * shrink;
-	//s.rgb += n;
-	
+
 	return s;
 }
 

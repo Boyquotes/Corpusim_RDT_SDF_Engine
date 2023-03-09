@@ -231,7 +231,7 @@ static func _get_shape_code(obj, pos_code: String, cut_layer:float = 0.) -> Stri
 				pos_code, ",",_get_param_code(obj, SDF.PARAM_OFFSET), "* shrink,",
 				_get_param_code(obj, SDF.PARAM_ROUNDING)," * shrink,",
 				_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY),"* shrink,",
-				_get_param_code(obj, SDF.PARAM_SIZE_SECONDARY),"* shrink,n)")
+				_get_param_code(obj, SDF.PARAM_SIZE_SECONDARY),"* shrink, n, 0.0)")
 					
 		SDF.SHAPE_SPHERE:
 			return str("get_sphere(", pos_code, ", vec3(0.0), ", 
@@ -298,7 +298,9 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		var pos_code := str("(", _get_param_code(obj, SDF.PARAM_TRANSFORM), "  * vec4(p, shrink)).xyz")
 		var indent = "\t"
 		
-		var shape_code : String = _get_shape_code(obj, pos_code)#+displace_code
+		var shape_code : String = _get_shape_code(obj, pos_code)
+		
+		
 		
 		# onion everything
 		var onioned_shape_code  = str("opOnion(", shape_code, ",.05 * shrink)")
@@ -326,7 +328,22 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		match obj.operation:
 			SDF.OP_UNION:
 				scene += str(indent, "s = smooth_union_c(s.w, ", shape_code, ", s.rgb, ",
-					_get_param_code(obj, SDF.PARAM_COLOR), ".rgb, ", 
+					#_get_param_code(obj, SDF.PARAM_COLOR), ".rgb, ",
+					str("mix(",_get_param_code(obj, SDF.PARAM_COLOR),".rgb, get_contrast_color(",
+					_get_param_code(obj, SDF.PARAM_COLOR),".rgb), get_generic_shape(",
+						_get_param_code(obj, SDF.PARAM_GENERIC_SHAPE),",",
+						pos_code, ",",_get_param_code(obj, SDF.PARAM_OFFSET), "* shrink,",
+						_get_param_code(obj, SDF.PARAM_ROUNDING)," * shrink,",
+						_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY),"* shrink,",
+						_get_param_code(obj, SDF.PARAM_SIZE_SECONDARY),"* shrink, n, 1.0)),"
+					#_get_param_code(obj, SDF.PARAM_COLOR), ".rgb +  ", 
+				#		str("get_generic_shape(",
+			#			_get_param_code(obj, SDF.PARAM_GENERIC_SHAPE),",",
+		#				pos_code, ",",_get_param_code(obj, SDF.PARAM_OFFSET), "* shrink,",
+	#					_get_param_code(obj, SDF.PARAM_ROUNDING)," * shrink,",
+#						_get_param_code(obj, SDF.PARAM_SIZE_PRIMARY),"* shrink,",
+	#					_get_param_code(obj, SDF.PARAM_SIZE_SECONDARY),"* shrink, n, 1.0),"
+					),
 					_get_param_code(obj, SDF.PARAM_SMOOTHNESS), "*shrink);\n")
 
 			SDF.OP_SUBTRACT:
