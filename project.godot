@@ -13,6 +13,7 @@ config_version=5
 config/name="Corpusim RDT SDF Engine"
 run/main_scene="res://World/World.tscn"
 config/features=PackedStringArray("4.0", "Vulkan Clustered")
+boot_splash/image="res://images/Splash.png"
 config/icon="res://icon.svg"
 
 [display]
