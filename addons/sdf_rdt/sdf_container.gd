@@ -303,7 +303,7 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 		
 		
 		# onion everything
-		var onioned_shape_code  = str("opOnion(", shape_code, ",.05 * shrink)")
+		var onioned_shape_code  = str("opOnion(", shape_code, ",",_get_param_code(obj, SDF.PARAM_ONION_THICKNESS)," * shrink)")
 		shape_code = str( "mix(",shape_code,",",onioned_shape_code,",",_get_param_code(obj, SDF.PARAM_ONION_ALPHA),")" )
 		
 		
