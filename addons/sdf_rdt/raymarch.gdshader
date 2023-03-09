@@ -231,7 +231,7 @@ float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, floa
 			break;
 	}
 	
-	return mix(d+n,n,d_n);
+	return mix(d+n*shrink,n,d_n);
 }
 
 float sharp_union(float a, float b) {
@@ -290,10 +290,10 @@ float opOnion( in float sdf, in float thickness )
 vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	vec4 s = vec4(1.0, 1.0, 1.0, 99999.0);
 	
-	vec4 n = vec4(noise3D(TIME*.09+p*.2/shrink),
-				  noise3D(TIME*.14+p*.46/shrink),
-				  noise3D(TIME*.04+p*1.05/shrink),
-				  noise3D(TIME*.18+p*2.43/shrink) );
+	vec4 n = vec4(noise3D( (TIME*.09+p*.2)/shrink),
+				  noise3D( (TIME*.14+p*.46)/shrink),
+				  noise3D( (TIME*.04+p*1.05)/shrink),
+				  noise3D( (TIME*.18+p*2.43)/shrink) );
 
 	
 	
@@ -363,18 +363,17 @@ void fragment() {
 	float d = rm.w;
 	
 	if (d > MAX_DISTANCE * shrink) {
-		// TODO: render background shader
+		// TODO: render background shader instead
 		discard;
 	}
 
 	
 	vec4 sdf_ndc = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ray_origin + ray_dir * d, 1.0);
 	DEPTH = (sdf_ndc.z / sdf_ndc.w) * 0.5 + 0.5;
-	//DEPTH = clamp(d*.02,0.,1.);
-	
-	
+		
 	NORMAL = (VIEW_MATRIX * vec4(normal, 0.0)).xyz;
 	
-	ALBEDO = mix(rm.rgb, fog_color, clamp(0.,1.,DEPTH * 100. - 99.));
+	//ALBEDO = mix(rm.rgb, fog_color, clamp(0.,1.,DEPTH * 100. - 99.));
+	ALBEDO = mix(rm.rgb, fog_color, clamp(0.,0.8,DEPTH * 200. - 199.));
 	
 }

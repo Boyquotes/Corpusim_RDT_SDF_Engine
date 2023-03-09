@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="8_eob7v"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="9_7c4ph"]
 
-[sub_resource type="Shader" id="Shader_3xppu"]
+[sub_resource type="Shader" id="Shader_5b34r"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -486,9 +486,9 @@ void fragment() {
 
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ijjiu"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3wbkq"]
 render_priority = 0
-shader = SubResource("Shader_3xppu")
+shader = SubResource("Shader_5b34r")
 shader_parameter/u_shape3_rounding = 0.2
 shader_parameter/u_shape3_onion_thickness = 0.251
 shader_parameter/u_shape3_onion_alpha = 1.0
@@ -507,14 +507,14 @@ shader_parameter/u_shape2_offset = Vector3(0, 0, 0)
 shader_parameter/u_shape2_layer = 1.0
 shader_parameter/u_shape2_generic_shape = 3
 shader_parameter/u_shape2_color = Color(0.423529, 0.305882, 0.184314, 1)
-shader_parameter/u_shape1_transform = Transform3D(-0.963772, -0.282046, 0, 0.28201, -0.963829, 0, 0, 0, 1.00004, -3.13045, 0.922279, -0.464716)
+shader_parameter/u_shape1_transform = Transform3D(0.811602, -0.591254, 0, 0.591231, 0.811665, 0, 0, 0, 1.00004, 2.64116, 1.91656, -0.464716)
 shader_parameter/u_shape1_smoothness = 0.2
 shader_parameter/u_shape1_size_secondary = 0.37
 shader_parameter/u_shape1_size_primary = 1.05
 shader_parameter/u_shape1_rounding = -0.16
 shader_parameter/u_shape1_onion_thickness = 0.0
 shader_parameter/u_shape1_onion_alpha = 0.0
-shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.72922, -2.29855, 11.7582)
+shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.72922, -2.29855, 12.6024)
 shader_parameter/u_shape5_smoothness = 0.2
 shader_parameter/u_shape5_size_secondary = 2.66551
 shader_parameter/u_shape5_size_primary = 3.032
@@ -536,7 +536,7 @@ shader_parameter/u_shape4_offset = Vector3(0, 0, 0)
 shader_parameter/u_shape4_layer = 1.0
 shader_parameter/u_shape4_generic_shape = 0
 shader_parameter/u_shape4_color = Color(0.662745, 0.192157, 0.6, 1)
-shader_parameter/u_shape3_transform = Transform3D(0.679011, -0.29744, -0.668917, 0.421, 0.907065, 0.0240447, 0.598968, -0.297682, 0.741471, -11.0927, -1.03753, -1.10365)
+shader_parameter/u_shape3_transform = Transform3D(0.899847, -0.420308, 0.0990888, 0.421003, 0.907063, 0.0240463, -0.0998859, 0.0200184, 0.993629, -8.27469, -1.03755, 7.46855)
 shader_parameter/u_shape3_smoothness = 0.2
 shader_parameter/u_shape3_size_secondary = 6.26073
 shader_parameter/u_shape3_size_primary = 1.724
@@ -551,7 +551,7 @@ shader_parameter/u_shape1000_offset = Vector3(0, 0, 0)
 shader_parameter/u_shape1000_layer = 1.0
 shader_parameter/u_shape1000_generic_shape = 1
 shader_parameter/u_shape1000_color = Color(1, 1, 1, 1)
-shader_parameter/u_shape0_transform = Transform3D(0.5, -0.866026, 0, 0.866026, 0.5, 0, 0, 0, 1, 0.785919, 1.34926, 0.782355)
+shader_parameter/u_shape0_transform = Transform3D(0.5, -0.866026, 0, 0.866026, 0.5, 0, 0, 0, 1, 0.785919, 1.34926, 1.01257)
 shader_parameter/u_shape0_smoothness = 0.2
 shader_parameter/u_shape0_size_secondary = 0.516588
 shader_parameter/u_shape0_size_primary = 3.6582
@@ -591,7 +591,7 @@ shader_parameter/u_shape1001_layer = 1.0
 shader_parameter/u_shape1001_generic_shape = 1
 shader_parameter/u_shape1001_color = Color(1, 1, 1, 1)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_idbhd"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_yp2rl"]
 flip_faces = true
 orientation = 2
 
@@ -642,9 +642,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_ijjiu")
+material_override = SubResource("ShaderMaterial_3wbkq")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_idbhd")
+mesh = SubResource("PlaneMesh_yp2rl")
 script = ExtResource("2_vw6ij")
 
 [node name="Cutaway1" type="Node3D" parent="SDFContainer"]
@@ -678,7 +678,7 @@ operation = 3
 layer = 1.0
 
 [node name="Torus" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(0.5, 0.866025, 0, -0.866025, 0.5, 0, 0, 0, 1, -1.5615, 0, -0.780669)
+transform = Transform3D(0.5, 0.866025, 0, -0.866025, 0.5, 0, 0, 0, 1, -1.5615, 0, -1.01089)
 script = ExtResource("7_vvng6")
 size_primary = 3.6582
 size_secondary = 0.516588
@@ -693,7 +693,7 @@ color = Color(0.341176, 0.345098, 0.647059, 1)
 layer = 1.0
 
 [node name="red-cone" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(-0.955752, 0.279683, 0, -0.279647, -0.955695, 0, 0, 0, 0.999957, -3.24993, 0, 0.466381)
+transform = Transform3D(0.80497, 0.586377, 0, -0.586354, 0.804907, 0, 0, 0, 0.999957, -3.24993, 0, 0.466381)
 script = ExtResource("7_vvng6")
 size_primary = 1.05
 size_secondary = 0.37
@@ -720,7 +720,7 @@ color = Color(0.423529, 0.305882, 0.184314, 1)
 layer = 1.0
 
 [node name="greenbox" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(0.68152, 0.420779, 0.601188, -0.298546, 0.906522, -0.29873, -0.670398, 0.0240359, 0.743092, 8.65992, -2.70682, -6.58978)
+transform = Transform3D(0.903304, 0.420779, -0.100264, -0.421891, 0.906522, 0.0201344, 0.0993055, 0.0240359, 0.995927, 8.65992, -2.70682, -6.58978)
 script = ExtResource("7_vvng6")
 size_primary = 1.724
 size_secondary = 6.26073
@@ -748,7 +748,7 @@ color = Color(0.662745, 0.192157, 0.6, 1)
 layer = 1.0
 
 [node name="yellowball" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.72927, 2.29255, -11.7566)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.72927, 2.29255, -12.6007)
 script = ExtResource("7_vvng6")
 size_primary = 3.032
 size_secondary = 2.66551
