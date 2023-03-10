@@ -46,4 +46,4 @@ Right Mouse Button : Clear all **Cutaways** previously placed
 
 To use the software, download it from [Releases](https://github.com/Corpusim/Corpusim_RDT_SDF_Engine/releases)
 
-To work on the software itself in the Godot Editor, you must be running Godot v4.0 beta1.
+To work on the software itself in the Godot Editor, you must be running Godot v4.0.
