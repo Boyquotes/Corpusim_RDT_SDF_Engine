@@ -1,7 +1,8 @@
 @tool
-extends MeshInstance3D
+class_name sdf_container extends MeshInstance3D
 
 const SDF = preload("./sdf.gd")
+
 var SDFItem = load("res://addons/sdf_rdt/sdf_item.gd")
 var SDFGeneric = load("res://addons/sdf_rdt/sdf_generic.gd")
 
@@ -133,7 +134,7 @@ func _update_objects_from_children():
 	_cutaways.clear()
 	for child_index in get_child_count():
 		var child = get_child(child_index)
-		if child is SDFItem:
+		if child is sdf_item:
 			if child.operation == SDF.OP_CUTAWAY:
 				_cutaways.append(child.get_sdf_scene_object())
 			else:
@@ -147,10 +148,9 @@ func _update_aabb():
 
 
 static func _load_shader_template(fpath: String) -> ShaderTemplate:
-	var f := File.new()
-	var err := f.open(fpath, File.READ)
-	if err != OK:
-		push_error("Could not load {0}: error {1}".format([fpath, err]))
+	var f := FileAccess.open(fpath, FileAccess.READ)
+	if f == null:
+		push_error("Could not load {0}: error {1}".format([fpath, f]))
 		return null
 	var template := ShaderTemplate.new()
 	var tags := [
@@ -160,7 +160,7 @@ static func _load_shader_template(fpath: String) -> ShaderTemplate:
 		"//</scene>"
 	]
 	var tag_index := 0
-	while not f.eof_reached():
+	while f.get_position() < f.get_length():
 		var line := f.get_line()
 		if tag_index < len(tags) and line.find(tags[tag_index]) != -1:
 			tag_index += 1
@@ -372,10 +372,9 @@ static func _generate_shader_code(objects : Array, template: ShaderTemplate, cut
 
 
 static func _debug_dump_text_file(fpath: String, text: String):
-	var f = File.new()
-	var err = f.open(fpath, File.WRITE)
-	if err != OK:
-		push_error("Could not save file {0}: error {1}".format([fpath, err]))
+	var f := FileAccess.open(fpath, FileAccess.WRITE)
+	if f == null:
+		push_error("Could not save file {0}: error {1}".format([fpath, f]))
 		return
 	f.store_string(text)
 	f.close()

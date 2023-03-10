@@ -31,7 +31,7 @@ func _has_gizmo(spatial: Node3D) -> bool:
 
 
 func _get_handle_value(gizmo: EditorNode3DGizmo, index: int, secondary:= false):
-	var node : SDFGeneric = gizmo.get_spatial_node()
+	var node : SDFGeneric = gizmo.get_node_3d()
 	match index:
 		INDEX_SIZE_PRIMARY:
 			return node.size_primary
@@ -40,7 +40,7 @@ func _get_handle_value(gizmo: EditorNode3DGizmo, index: int, secondary:= false):
 
 
 func _set_handle(gizmo: EditorNode3DGizmo, index: int, secondary: bool, camera: Camera3D, screen_point: Vector2):
-	var node : SDFGeneric = gizmo.get_spatial_node()
+	var node : SDFGeneric = gizmo.get_node_3d()
 
 	var ray_pos := camera.project_ray_origin(screen_point)
 	var ray_dir := camera.project_ray_normal(screen_point)
@@ -69,7 +69,7 @@ static func _get_axis_distance(
 
 
 func _commit_handle(gizmo: EditorNode3DGizmo, index: int, secondary, restore, cancel := false):
-	var node : SDFGeneric = gizmo.get_spatial_node()
+	var node : SDFGeneric = gizmo.get_node_3d()
 	var ur := _undo_redo
 	
 	match index:
@@ -89,7 +89,7 @@ func _commit_handle(gizmo: EditorNode3DGizmo, index: int, secondary, restore, ca
 func _redraw(gizmo: EditorNode3DGizmo):
 	gizmo.clear()
 	
-	var node : SDFGeneric = gizmo.get_spatial_node()
+	var node : SDFGeneric = gizmo.get_node_3d()
 	var size_secondary := node.size_secondary
 	var size_primary := node.size_primary
 	

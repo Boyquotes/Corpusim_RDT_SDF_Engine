@@ -57,6 +57,8 @@ var start_pos : Vector3
 		start_pos = position
 		osc_z = b
 
+
+
 @export var MAX_OSC : float = 3.0
 @export_range(0.0,.6,.02) var spin_speed : float = 0.0
 

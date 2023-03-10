@@ -37,7 +37,7 @@ func _enter_tree():
 	
 	for gizmo_plugin in _gizmo_plugins:
 		gizmo_plugin.set_undo_redo(get_undo_redo())
-		add_spatial_gizmo_plugin(gizmo_plugin)
+		add_node_3d_gizmo_plugin(gizmo_plugin)
 		
 
 
@@ -50,4 +50,4 @@ func _exit_tree():
 	remove_custom_type("SDFGeneric")
 
 	for gizmo_plugin in _gizmo_plugins:
-		remove_spatial_gizmo_plugin(gizmo_plugin)
+		remove_node_3d_gizmo_plugin(gizmo_plugin)

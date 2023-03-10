@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bsi6feik85wmn" path="res://Hierarch/hierarch.tscn" id="8_eob7v"]
 [ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="9_7c4ph"]
 
-[sub_resource type="Shader" id="Shader_mmc3l"]
+[sub_resource type="Shader" id="Shader_dw2gb"]
 code = "shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -482,126 +482,125 @@ void fragment() {
 	ALBEDO = mix(rm.rgb, fog_color, clamp(0.,0.8,DEPTH * 200. - 199.));
 	
 }
-
 "
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_cuytw"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8xl07"]
 render_priority = 0
-shader = SubResource("Shader_mmc3l")
-shader_parameter/u_shape3_rounding = 0.2
-shader_parameter/u_shape3_onion_thickness = 0.251
-shader_parameter/u_shape3_onion_alpha = 1.0
-shader_parameter/u_shape3_offset = Vector3(0, 0, 0)
-shader_parameter/u_shape3_layer = 1.0
-shader_parameter/u_shape3_generic_shape = 1
-shader_parameter/u_shape3_color = Color(0.282353, 0.431373, 0.231373, 1)
-shader_parameter/u_shape2_transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 19.0866, -0.00168875, 82.6974)
-shader_parameter/u_shape2_smoothness = 0.2
-shader_parameter/u_shape2_size_secondary = 530.842
-shader_parameter/u_shape2_size_primary = 80.0
-shader_parameter/u_shape2_rounding = 0.2
-shader_parameter/u_shape2_onion_thickness = 0.0
-shader_parameter/u_shape2_onion_alpha = 0.0
-shader_parameter/u_shape2_offset = Vector3(0, 0, 0)
-shader_parameter/u_shape2_layer = 1.0
-shader_parameter/u_shape2_generic_shape = 3
-shader_parameter/u_shape2_color = Color(0.423529, 0.305882, 0.184314, 1)
-shader_parameter/u_shape1_transform = Transform3D(-0.676412, -0.74235, 0, 0.742291, -0.676439, 0, 0, 0, 1.00004, -2.19381, 2.41642, -0.464716)
-shader_parameter/u_shape1_smoothness = 0.2
-shader_parameter/u_shape1_size_secondary = 0.37
-shader_parameter/u_shape1_size_primary = 1.05
-shader_parameter/u_shape1_rounding = -0.16
-shader_parameter/u_shape1_onion_thickness = 0.0
-shader_parameter/u_shape1_onion_alpha = 0.0
-shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.72922, -2.29855, 11.6172)
-shader_parameter/u_shape5_smoothness = 0.2
-shader_parameter/u_shape5_size_secondary = 2.66551
-shader_parameter/u_shape5_size_primary = 3.032
-shader_parameter/u_shape5_rounding = 0.2
-shader_parameter/u_shape5_onion_thickness = 0.0
-shader_parameter/u_shape5_onion_alpha = 0.0
-shader_parameter/u_shape5_offset = Vector3(0, 0, 0)
-shader_parameter/u_shape5_layer = 1.0
-shader_parameter/u_shape5_generic_shape = 0
-shader_parameter/u_shape5_color = Color(0.760784, 0.694118, 0.431373, 1)
-shader_parameter/u_shape4_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.48519, 2.994, 11.7976)
-shader_parameter/u_shape4_smoothness = 0.2
-shader_parameter/u_shape4_size_secondary = 2.657
-shader_parameter/u_shape4_size_primary = 7.57
-shader_parameter/u_shape4_rounding = 0.2
-shader_parameter/u_shape4_onion_thickness = 0.435
-shader_parameter/u_shape4_onion_alpha = 1.0
-shader_parameter/u_shape4_offset = Vector3(0, 0, 0)
-shader_parameter/u_shape4_layer = 1.0
-shader_parameter/u_shape4_generic_shape = 0
-shader_parameter/u_shape4_color = Color(0.662745, 0.192157, 0.6, 1)
-shader_parameter/u_shape3_transform = Transform3D(-0.272351, 0.101083, 0.955472, 0.421011, 0.90706, 0.02405, -0.863245, 0.408374, -0.289768, 8.92952, -1.03761, 6.66863)
-shader_parameter/u_shape3_smoothness = 0.2
-shader_parameter/u_shape3_size_secondary = 6.26073
-shader_parameter/u_shape3_size_primary = 1.724
+shader = SubResource("Shader_dw2gb")
 shader_parameter/u_shape1000_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
-shader_parameter/u_shape1000_smoothness = 0.2
-shader_parameter/u_shape1000_size_secondary = 3.0
-shader_parameter/u_shape1000_size_primary = 0.0
-shader_parameter/u_shape1000_rounding = 0.0
-shader_parameter/u_shape1000_onion_thickness = 0.0
-shader_parameter/u_shape1000_onion_alpha = 0.0
-shader_parameter/u_shape1000_offset = Vector3(0, 0, 0)
-shader_parameter/u_shape1000_layer = 1.0
-shader_parameter/u_shape1000_generic_shape = 1
 shader_parameter/u_shape1000_color = Color(1, 1, 1, 1)
-shader_parameter/u_shape0_transform = Transform3D(0.5, -0.866026, 0, 0.866026, 0.5, 0, 0, 0, 1, 0.785919, 1.34926, 0.743782)
-shader_parameter/u_shape0_smoothness = 0.2
-shader_parameter/u_shape0_size_secondary = 0.516588
-shader_parameter/u_shape0_size_primary = 3.6582
-shader_parameter/u_shape0_rounding = 0.2
-shader_parameter/u_shape0_onion_thickness = 0.0
-shader_parameter/u_shape0_onion_alpha = 0.0
-shader_parameter/u_shape0_offset = Vector3(0.5, 0.5, 0.8)
-shader_parameter/u_shape0_layer = 1.0
-shader_parameter/u_shape0_generic_shape = 2
-shader_parameter/u_shape0_color = Color(0.341176, 0.345098, 0.647059, 1)
-shader_parameter/shrink = 1.0
-shader_parameter/fog_color = null
-shader_parameter/u_shape1_offset = Vector3(0, 3.814, 0)
-shader_parameter/u_shape1_layer = 1.0
-shader_parameter/u_shape1_generic_shape = 4
-shader_parameter/u_shape1_color = Color(1, 0.32549, 0.113725, 1)
-shader_parameter/u_shape1002_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
-shader_parameter/u_shape1002_smoothness = 0.2
-shader_parameter/u_shape1002_size_secondary = 0.0
-shader_parameter/u_shape1002_size_primary = 0.0
-shader_parameter/u_shape1002_rounding = 0.0
-shader_parameter/u_shape1002_onion_thickness = 0.0
-shader_parameter/u_shape1002_onion_alpha = 0.0
-shader_parameter/u_shape1002_offset = Vector3(0, 0, 0)
-shader_parameter/u_shape1002_layer = 1.0
-shader_parameter/u_shape1002_generic_shape = 1
-shader_parameter/u_shape1002_color = Color(1, 1, 1, 1)
+shader_parameter/u_shape1000_smoothness = 0.2
+shader_parameter/u_shape1000_layer = 1.0
+shader_parameter/u_shape1000_size_primary = 3.0
+shader_parameter/u_shape1000_size_secondary = 3.0
+shader_parameter/u_shape1000_generic_shape = 1
+shader_parameter/u_shape1000_rounding = 0.2
+shader_parameter/u_shape1000_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape1000_onion_alpha = 0.0
+shader_parameter/u_shape1000_onion_thickness = 0.0
 shader_parameter/u_shape1001_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
-shader_parameter/u_shape1001_smoothness = 0.2
-shader_parameter/u_shape1001_size_secondary = 0.0
-shader_parameter/u_shape1001_size_primary = 0.0
-shader_parameter/u_shape1001_rounding = 0.0
-shader_parameter/u_shape1001_onion_thickness = 0.0
-shader_parameter/u_shape1001_onion_alpha = 0.0
-shader_parameter/u_shape1001_offset = Vector3(0, 0, 0)
-shader_parameter/u_shape1001_layer = 1.0
-shader_parameter/u_shape1001_generic_shape = 1
 shader_parameter/u_shape1001_color = Color(1, 1, 1, 1)
+shader_parameter/u_shape1001_smoothness = 0.2
+shader_parameter/u_shape1001_layer = 1.0
+shader_parameter/u_shape1001_size_primary = 3.0
+shader_parameter/u_shape1001_size_secondary = 3.0
+shader_parameter/u_shape1001_generic_shape = 1
+shader_parameter/u_shape1001_rounding = 0.2
+shader_parameter/u_shape1001_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape1001_onion_alpha = 0.0
+shader_parameter/u_shape1001_onion_thickness = 0.0
+shader_parameter/u_shape1002_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.72069e-05, -0.00599527, 0.00168514)
+shader_parameter/u_shape1002_color = Color(1, 1, 1, 1)
+shader_parameter/u_shape1002_smoothness = 0.2
+shader_parameter/u_shape1002_layer = 1.0
+shader_parameter/u_shape1002_size_primary = 3.0
+shader_parameter/u_shape1002_size_secondary = 3.0
+shader_parameter/u_shape1002_generic_shape = 1
+shader_parameter/u_shape1002_rounding = 0.2
+shader_parameter/u_shape1002_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape1002_onion_alpha = 0.0
+shader_parameter/u_shape1002_onion_thickness = 0.0
+shader_parameter/u_shape0_transform = Transform3D(0.5, -0.866026, 0, 0.866026, 0.5, 0, 0, 0, 1, 0.785919, 1.34926, 1.1378)
+shader_parameter/u_shape0_color = Color(0.341176, 0.345098, 0.647059, 1)
+shader_parameter/u_shape0_smoothness = 0.2
+shader_parameter/u_shape0_layer = 1.0
+shader_parameter/u_shape0_size_primary = 3.6582
+shader_parameter/u_shape0_size_secondary = 0.516588
+shader_parameter/u_shape0_generic_shape = 2
+shader_parameter/u_shape0_rounding = 0.2
+shader_parameter/u_shape0_offset = Vector3(0.5, 0.5, 0.8)
+shader_parameter/u_shape0_onion_alpha = 0.0
+shader_parameter/u_shape0_onion_thickness = 0.0
+shader_parameter/u_shape1_transform = Transform3D(0.756869, -0.660528, 0, 0.660516, 0.756906, 0, 0, 0, 1.00004, 2.4637, 2.14206, -0.464716)
+shader_parameter/u_shape1_color = Color(1, 0.32549, 0.113725, 1)
+shader_parameter/u_shape1_smoothness = 0.2
+shader_parameter/u_shape1_layer = 1.0
+shader_parameter/u_shape1_size_primary = 1.05
+shader_parameter/u_shape1_size_secondary = 0.37
+shader_parameter/u_shape1_generic_shape = 4
+shader_parameter/u_shape1_rounding = -0.16
+shader_parameter/u_shape1_offset = Vector3(0, 3.814, 0)
+shader_parameter/u_shape1_onion_alpha = 0.0
+shader_parameter/u_shape1_onion_thickness = 0.0
+shader_parameter/u_shape2_transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 19.0866, -0.00168875, 82.6974)
+shader_parameter/u_shape2_color = Color(0.423529, 0.305882, 0.184314, 1)
+shader_parameter/u_shape2_smoothness = 0.2
+shader_parameter/u_shape2_layer = 1.0
+shader_parameter/u_shape2_size_primary = 80.0
+shader_parameter/u_shape2_size_secondary = 530.842
+shader_parameter/u_shape2_generic_shape = 3
+shader_parameter/u_shape2_rounding = 0.2
+shader_parameter/u_shape2_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape2_onion_alpha = 0.0
+shader_parameter/u_shape2_onion_thickness = 0.0
+shader_parameter/u_shape3_transform = Transform3D(-0.379306, -0.627664, -0.676966, 0.844184, -0.53606, 0.0240555, -0.377561, -0.561628, 0.733727, -3.05494, -8.19409, 6.40767)
+shader_parameter/u_shape3_color = Color(0.282353, 0.431373, 0.231373, 1)
+shader_parameter/u_shape3_smoothness = 0.2
+shader_parameter/u_shape3_layer = 1.0
+shader_parameter/u_shape3_size_primary = 1.724
+shader_parameter/u_shape3_size_secondary = 6.26073
+shader_parameter/u_shape3_generic_shape = 1
+shader_parameter/u_shape3_rounding = 0.2
+shader_parameter/u_shape3_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape3_onion_alpha = 1.0
+shader_parameter/u_shape3_onion_thickness = 0.251
+shader_parameter/u_shape4_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.48519, 2.994, 11.7976)
+shader_parameter/u_shape4_color = Color(0.662745, 0.192157, 0.6, 1)
+shader_parameter/u_shape4_smoothness = 0.2
+shader_parameter/u_shape4_layer = 1.0
+shader_parameter/u_shape4_size_primary = 7.57
+shader_parameter/u_shape4_size_secondary = 2.657
+shader_parameter/u_shape4_generic_shape = 0
+shader_parameter/u_shape4_rounding = 0.2
+shader_parameter/u_shape4_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape4_onion_alpha = 1.0
+shader_parameter/u_shape4_onion_thickness = 0.435
+shader_parameter/u_shape5_transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.72922, -2.29855, 13.0619)
+shader_parameter/u_shape5_color = Color(0.760784, 0.694118, 0.431373, 1)
+shader_parameter/u_shape5_smoothness = 0.2
+shader_parameter/u_shape5_layer = 1.0
+shader_parameter/u_shape5_size_primary = 3.032
+shader_parameter/u_shape5_size_secondary = 2.66551
+shader_parameter/u_shape5_generic_shape = 0
+shader_parameter/u_shape5_rounding = 0.2
+shader_parameter/u_shape5_offset = Vector3(0, 0, 0)
+shader_parameter/u_shape5_onion_alpha = 0.0
+shader_parameter/u_shape5_onion_thickness = 0.0
+shader_parameter/fog_color = Color(0.005, 0.005, 0.005, 1)
+shader_parameter/shrink = 1.0
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_7nh3s"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_5s5uc"]
 flip_faces = true
 orientation = 2
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fkooi"]
 shader = ExtResource("7_liiw3")
-shader_parameter/colorA = Color(0.305882, 0.180392, 0.14902, 1)
-shader_parameter/colorB = Color(0.121569, 0.0470588, 0.0352941, 1)
-shader_parameter/patch_size = 0.47
-shader_parameter/patch_start = 0.408
 shader_parameter/repetition = 3.5
 shader_parameter/speed = 0.04
+shader_parameter/colorA = Color(0.305882, 0.180392, 0.14902, 1)
+shader_parameter/colorB = Color(0.121569, 0.0470588, 0.0352941, 1)
+shader_parameter/patch_start = 0.408
+shader_parameter/patch_size = 0.47
 
 [sub_resource type="Sky" id="Sky_us488"]
 sky_material = SubResource("ShaderMaterial_fkooi")
@@ -641,16 +640,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
 [node name="SDFContainer" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.72069e-05, 0.00599527, -0.00168514)
-material_override = SubResource("ShaderMaterial_cuytw")
+material_override = SubResource("ShaderMaterial_8xl07")
 extra_cull_margin = 16384.0
-mesh = SubResource("PlaneMesh_7nh3s")
+mesh = SubResource("PlaneMesh_5s5uc")
 script = ExtResource("2_vw6ij")
 
 [node name="Cutaway1" type="Node3D" parent="SDFContainer"]
 script = ExtResource("7_vvng6")
-size_primary = 0.0
+size_primary = 3.0
 size_secondary = 3.0
-rounding = 0.0
+rounding = 0.2
 onion_thickness = 0.0
 g_shape = 1
 operation = 3
@@ -658,9 +657,9 @@ layer = 1.0
 
 [node name="Cutaway2" type="Node3D" parent="SDFContainer"]
 script = ExtResource("7_vvng6")
-size_primary = 0.0
-size_secondary = 0.0
-rounding = 0.0
+size_primary = 3.0
+size_secondary = 3.0
+rounding = 0.2
 onion_thickness = 0.0
 g_shape = 1
 operation = 3
@@ -668,16 +667,16 @@ layer = 1.0
 
 [node name="Cutaway3" type="Node3D" parent="SDFContainer"]
 script = ExtResource("7_vvng6")
-size_primary = 0.0
-size_secondary = 0.0
-rounding = 0.0
+size_primary = 3.0
+size_secondary = 3.0
+rounding = 0.2
 onion_thickness = 0.0
 g_shape = 1
 operation = 3
 layer = 1.0
 
 [node name="Torus" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(0.5, 0.866025, 0, -0.866025, 0.5, 0, 0, 0, 1, -1.5615, 0, -0.742096)
+transform = Transform3D(0.5, 0.866025, 0, -0.866025, 0.5, 0, 0, 0, 1, -1.5615, 0, -1.13612)
 script = ExtResource("7_vvng6")
 size_primary = 3.6582
 size_secondary = 0.516588
@@ -692,7 +691,7 @@ color = Color(0.341176, 0.345098, 0.647059, 1)
 layer = 1.0
 
 [node name="red-cone" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(-0.670677, 0.736026, 0, -0.735968, -0.67065, 0, 0, 0, 0.999957, -3.24993, 0, 0.466381)
+transform = Transform3D(0.75003, 0.654527, 0, -0.654515, 0.749993, 0, 0, 0, 0.999957, -3.24993, 0, 0.466381)
 script = ExtResource("7_vvng6")
 size_primary = 1.05
 size_secondary = 0.37
@@ -719,7 +718,7 @@ color = Color(0.423529, 0.305882, 0.184314, 1)
 layer = 1.0
 
 [node name="greenbox" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(-0.273502, 0.420779, -0.866913, 0.101548, 0.906522, 0.410079, 0.9579, 0.0240359, -0.290492, 8.65992, -2.70682, -6.58978)
+transform = Transform3D(-0.381139, 0.843676, -0.379315, -0.630679, -0.535769, -0.564325, -0.678877, 0.0240359, 0.735757, 8.17927, -2.70682, -6.58978)
 script = ExtResource("7_vvng6")
 size_primary = 1.724
 size_secondary = 6.26073
@@ -747,7 +746,7 @@ color = Color(0.662745, 0.192157, 0.6, 1)
 layer = 1.0
 
 [node name="yellowball" type="Node3D" parent="SDFContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.72927, 2.29255, -11.6155)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.72927, 2.29255, -13.0602)
 script = ExtResource("7_vvng6")
 size_primary = 3.032
 size_secondary = 2.66551

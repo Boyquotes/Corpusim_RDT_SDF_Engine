@@ -1,5 +1,5 @@
 @tool
-extends Node3D
+class_name sdf_item extends Node3D
 
 const SDF = preload("./sdf.gd")
 const SDFContainer = preload("./sdf_container.gd")
