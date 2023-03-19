@@ -1,3 +1,5 @@
+#define NOISE_ON true
+
 shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
@@ -193,7 +195,7 @@ float sdPlane( vec3 p, vec3 n, float h )
   return dot(p,n) + h;
 }
 
-float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2, vec4 noise, float d_n ){
+float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2, vec3 noise, float d_n ){
 	float d = 0.;
 	float n = 0.;
 	switch (shape_sel){
@@ -208,7 +210,7 @@ float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, floa
 		case ROUNDED_CONE:
 			d = get_round_cone(p, vec3(0.0), offset,size1,size2);
 			n -= smoothstep(0.,.3,noise.y)*.06;
-			n -= noise.w*.04;
+			n -= noise.z*.04;
 			break;
 			//float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
 		case ROUNDED_BOX:
@@ -220,11 +222,11 @@ float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, floa
 			//d -= smoothstep(0.,.3,noise3D( TIME*.09 +0.2*p/shrink))*.23;
 			//d -= noise3D(TIME*.14+2.3*p/shrink)*.04;
 			n -= smoothstep(.0,.5,noise.x)*.8;
-			n -= noise.z*.08;
+			n -= noise.z*.02;
 			break;
 		case TORUS:
 			d = get_torus(p, vec2(size1,size2) );
-			n -= noise.w*.1;
+			n -= noise.z*.1;
 			break;
 		default:
 		    d = get_sphere(p,offset,size2);
@@ -290,10 +292,17 @@ float opOnion( in float sdf, in float thickness )
 vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	vec4 s = vec4(1.0, 1.0, 1.0, 99999.0);
 	
-	vec4 n = vec4(noise3D( (TIME*.09+p*.2)/shrink),
-				  noise3D( (TIME*.14+p*.46)/shrink),
-				  noise3D( (TIME*.04+p*1.05)/shrink),
-				  noise3D( (TIME*.18+p*2.43)/shrink) );
+	vec3 n = vec3(0.);
+
+	
+
+	if (NOISE_ON){
+	n = vec3(	noise3D( (TIME*.09+p*.2)/shrink),
+				noise3D( (TIME*.14+p*.46)/shrink),
+				noise3D( (TIME*.04+p*1.05)/shrink)
+			);
+	}
+
 
 	
 	

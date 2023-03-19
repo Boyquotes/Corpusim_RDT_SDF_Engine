@@ -3,8 +3,8 @@ class_name sdf_container extends MeshInstance3D
 
 const SDF = preload("./sdf.gd")
 
-var SDFItem = load("res://addons/sdf_rdt/sdf_item.gd")
-var SDFGeneric = load("res://addons/sdf_rdt/sdf_generic.gd")
+var SDFItem = preload("res://addons/sdf_rdt/sdf_item.gd")
+var SDFGeneric = preload("res://addons/sdf_rdt/sdf_generic.gd")
 
 const SHADER_PATH = "res://addons/sdf_rdt/raymarch.gdshader"
 
