@@ -296,10 +296,17 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 
 	
 
+	if (false){
+	n = vec3(	noise3D( (TIME*.04+p*0.20)/shrink),
+				noise3D( (TIME*.09+p*0.46)/shrink),
+				noise3D( (TIME*.14+p*1.05)/shrink)
+			);
+	}
+
 	if (NOISE_ON){
-	n = vec3(	noise3D( (TIME*.09+p*.2)/shrink),
-				noise3D( (TIME*.14+p*.46)/shrink),
-				noise3D( (TIME*.04+p*1.05)/shrink)
+	n = vec3(	noise3D( TIME*.04+(p*0.20)/shrink),
+				noise3D( TIME*.09+(p*0.46)/shrink),
+				noise3D( TIME*.14+(p*1.05)/shrink)
 			);
 	}
 

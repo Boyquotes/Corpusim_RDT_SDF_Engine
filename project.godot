@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 [display]
 
 window/dpi/allow_hidpi=false
+window/stretch/mode="viewport"
 window/stretch/aspect="ignore"
 
 [editor_plugins]
