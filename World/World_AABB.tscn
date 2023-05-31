@@ -1,70 +1,26 @@
-[gd_scene load_steps=10 format=3 uid="uid://hcbmf8g23t06"]
+[gd_scene load_steps=5 format=3 uid="uid://hcbmf8g23t06"]
 
-[ext_resource type="PackedScene" uid="uid://bdm56ujj65teb" path="res://Player/Player.tscn" id="1_8v0ny"]
-[ext_resource type="Shader" path="res://World/sky_shader.gdshader" id="4_m3xm1"]
-[ext_resource type="PackedScene" uid="uid://c6b8prnjgm61h" path="res://GUI/hud.tscn" id="6_x6lnv"]
+[ext_resource type="Shader" path="res://SDF_Acceleration/ST_AABB.gdshader" id="1_squgk"]
 [ext_resource type="Script" path="res://SDF_Acceleration/sdf_container_aabb.gd" id="7_fjpba"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_88kvk"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rhh60"]
+render_priority = 0
+shader = ExtResource("1_squgk")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jc8r8"]
+material = SubResource("ShaderMaterial_rhh60")
 flip_faces = true
 orientation = 2
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_fkooi"]
-shader = ExtResource("4_m3xm1")
-shader_parameter/repetition = 3.5
-shader_parameter/speed = 0.04
-shader_parameter/colorA = Color(0.305882, 0.180392, 0.14902, 1)
-shader_parameter/colorB = Color(0.121569, 0.0470588, 0.0352941, 1)
-shader_parameter/patch_start = 0.408
-shader_parameter/patch_size = 0.47
-
-[sub_resource type="Sky" id="Sky_us488"]
-sky_material = SubResource("ShaderMaterial_fkooi")
-process_mode = 3
-
-[sub_resource type="Environment" id="Environment_gslwi"]
-background_mode = 2
-background_color = Color(0.129412, 0.490196, 0.741176, 1)
-sky = SubResource("Sky_us488")
-ambient_light_source = 3
-ambient_light_color = Color(1, 1, 1, 1)
-ambient_light_sky_contribution = 0.89
-ambient_light_energy = 0.64
-reflected_light_source = 1
-tonemap_mode = 3
-tonemap_exposure = 3.34
-fog_light_color = Color(0.160784, 0.14902, 0.180392, 1)
-fog_density = 0.0419
-fog_sky_affect = 0.968
-volumetric_fog_albedo = Color(0.290196, 0.290196, 0.290196, 1)
-volumetric_fog_length = 40.0
-volumetric_fog_sky_affect = 0.7
-
-[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_sdjvp"]
-dof_blur_far_enabled = true
-dof_blur_far_distance = 6.67
-dof_blur_far_transition = 188.51
-dof_blur_near_distance = 0.18
-dof_blur_near_transition = 0.1
-dof_blur_amount = 0.26
-
 [node name="Node3d" type="Node3D"]
 
-[node name="Player" parent="." instance=ExtResource("1_8v0ny")]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31504, 3.50588)
-
 [node name="SDFContainer_AABB" type="MeshInstance3D" parent="."]
-mesh = SubResource("PlaneMesh_88kvk")
+mesh = SubResource("PlaneMesh_jc8r8")
 script = ExtResource("7_fjpba")
 
 [node name="DirectionalLight3d" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.118519, -0.509056, 0.852535, -0.0120826, 0.859262, 0.511393, -0.992878, 0.0503092, -0.10799, 0, 3.2076, 7.80617)
 light_energy = 1.263
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_gslwi")
-camera_attributes = SubResource("CameraAttributesPractical_sdjvp")
-
-[node name="HUD" parent="." instance=ExtResource("6_x6lnv")]
-unique_name_in_owner = true
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.970025, 0.243006, 0, -0.243006, 0.970025, 1.19209e-07, 1.11489, 2.60139)

@@ -30,7 +30,7 @@ func _ready():
 	mesh = pm
 	
 	set_process(true)
-	_update_shader()
+	#_update_shader()
 	
 
 
@@ -51,6 +51,12 @@ func _update_shader():
 	# I want to reset all material params but Godot does not have an API for that,
 	# so I just create a new material
 	_shader_material = ShaderMaterial.new()
+	
+	#shader.code = load(SHADER_PATH)
+	
+	_shader_material.set_shader(shader)
+	
+	set_material_override(_shader_material)
 	
 
 

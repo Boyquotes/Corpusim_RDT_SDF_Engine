@@ -1,28 +1,14 @@
-#define NOISE_ON true
-
 shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
 
 
 
-//<uniforms>
-//</uniforms>
-
-uniform vec3 fog_color : source_color = vec3(.005);
-uniform float shrink = 1.0;
-
 const int MAX_STEPS = 64;
 const float MAX_DISTANCE = 100.0;
 const float SURFACE_DISTANCE = 0.005;
 const float NORMAL_PRECISION = 0.0005;
 
-const int SPHERE  = 0;
-const int ROUNDED_BOX = 1;
-const int TORUS = 2;
-const int CYLINDER = 3;
-const int ROUNDED_CONE = 4;
-const int PLANE = 5;
 
 
 void vertex() {
@@ -126,114 +112,8 @@ float noise3D(vec3 p)
 	
 }
 
-// TODO: employ tf uniforms to rotate noise with object
-float surface_noise(vec3 p){
-	float f;
-	f = smoothstep(0.,.3,noise3D( TIME*.09 +0.2*p/shrink))*.13;
-	p = p*2.3;
-	f += noise3D(TIME*.14+p/shrink)*.04;
-	return f;
-}
-
-vec3 get_contrast_color(vec3 col){
-
-	return vec3(1.,1.,0.);
-}
-
-
 float get_sphere(vec3 p, vec3 center, float radius) {
 	return length(p - center) - radius;
-}
-
-float get_box(vec3 p, vec3 b) {
-	vec3 q = abs(p) - b;
-	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
-}
-
-float get_rounded_box(vec3 p, vec3 b, float r) {
-	vec3 q = abs(p) - b;
-	return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0) - r;
-}
-
-float get_torus(vec3 p, vec2 r) {
-	vec2 q = vec2(length(p.xz) - r.x, p.y);
-	return length(q) - r.y;
-}
-
-float get_rounded_cylinder(vec3 p, float radius, float rounding, float h) {
-	vec2 d = vec2(length(p.xz) - radius + rounding, abs(p.y) - h);
-	return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - rounding;
-}
-
-float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
-{
-  // sampling independent computations (only depend on shape)
-  vec3  ba = b - a;
-  float l2 = dot(ba,ba);
-  float rr = r1 - r2;
-  float a2 = l2 - rr*rr;
-  float il2 = 1.0/l2;
-    
-  // sampling dependent computations
-  vec3 pa = p - a;
-  float y = dot(pa,ba);
-  float z = y - l2;
-  float x2 = dot2( pa*l2 - ba*y );
-  float y2 = y*y*l2;
-  float z2 = z*z*l2;
-
-  // single square root!
-  float k = sign(rr)*rr*rr*x2;
-  if( sign(z)*a2*z2>k ) return  sqrt(x2 + z2)        *il2 - r2;
-  if( sign(y)*a2*y2<k ) return  sqrt(x2 + y2)        *il2 - r1;
-                        return (sqrt(x2*a2*il2)+y*rr)*il2 - r1;
-}
-
-float sdPlane( vec3 p, vec3 n, float h )
-{
-  // n must be normalized
-  return dot(p,n) + h;
-}
-
-float get_generic_shape(int shape_sel, vec3 p, vec3 offset, float rounding, float size1, float size2, vec3 noise, float d_n ){
-	float d = 0.;
-	float n = 0.;
-	switch (shape_sel){
-		case SPHERE:
-		    d = get_sphere(p,offset,size1);
-			n -= smoothstep(0.,.1,noise.x) * .2;
-			n -= smoothstep(0.,.3,noise.z)*.08;
-			break;
-		case PLANE:
-			d = sdPlane(p, vec3(0,0,-1), size1);
-			break;
-		case ROUNDED_CONE:
-			d = get_round_cone(p, vec3(0.0), offset,size1,size2);
-			n -= smoothstep(0.,.3,noise.y)*.06;
-			n -= noise.z*.04;
-			break;
-			//float get_round_cone(vec3 p, vec3 a, vec3 b, float r1, float r2)
-		case ROUNDED_BOX:
-			d = get_rounded_box(p,vec3(size1,size2,size1),rounding);
-			n -= smoothstep(0.,.1,noise.y)*.16;
-			break;
-		case CYLINDER:
-			d = get_rounded_cylinder(p, size1, rounding, size2);
-			//d -= smoothstep(0.,.3,noise3D( TIME*.09 +0.2*p/shrink))*.23;
-			//d -= noise3D(TIME*.14+2.3*p/shrink)*.04;
-			n -= smoothstep(.0,.5,noise.x)*.8;
-			n -= noise.z*.02;
-			break;
-		case TORUS:
-			d = get_torus(p, vec2(size1,size2) );
-			n -= noise.z*.1;
-			break;
-		default:
-		    d = get_sphere(p,offset,size2);
-			break;
-	}
-	
-	return mix(d+n*shrink,n,d_n);
 }
 
 float sharp_union(float a, float b) {
@@ -295,31 +175,14 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	vec3 n = vec3(0.);
 
 	
-
-	if (false){
-	n = vec3(	noise3D( (TIME*.04+p*0.20)/shrink),
-				noise3D( (TIME*.09+p*0.46)/shrink),
-				noise3D( (TIME*.14+p*1.05)/shrink)
-			);
-	}
-
-	if (NOISE_ON){
-	n = vec3(	noise3D( TIME*.04+(p*0.20)/shrink),
-				noise3D( TIME*.09+(p*0.46)/shrink),
-				noise3D( TIME*.14+(p*1.05)/shrink)
-			);
-	}
-
-
-	
 	
 	//<scene>
-	s.w = sharp_union(s.w, get_sphere(p, vec3(0.0), 1.0));
-	s.w = subtract(s.w, get_sphere(p, vec3(1.0, 0.0, 0.0), 0.8));
-	p = repeat_domain(p, vec3(3.0), vec3(5.0, 0.0, 0.0));
-	s = smooth_union_c(s.w, get_box(p, vec3(0.1, 0.5, 1.5)), s.rgb, vec3(1.0, 0.0, 0.0), 0.3);
-	s.w = subtract(s.w, get_sphere(p, vec3(0.6, 0.2, 0.5), 0.4));
-	s = smooth_subtract_c(s.w, get_sphere(p, vec3(0.3, 0.0, 1.5), 0.5), s.rgb, vec3(0.0, 1.0, 0.0), 0.1);
+	s.w = sharp_union(s.w, get_sphere(p, vec3(0.0), .8+.1*sin(time)));
+	//s.w = subtract(s.w, get_sphere(p, vec3(1.0, 0.0, 0.0), 0.8));
+//	p = repeat_domain(p, vec3(3.0), vec3(5.0, 0.0, 0.0));
+//  s = smooth_union_c(s.w, get_box(p, vec3(0.1, 0.5, 1.5)), s.rgb, vec3(1.0, 0.0, 0.0), 0.3);
+//	s.w = subtract(s.w, get_sphere(p, vec3(0.6, 0.2, 0.5), 0.4));
+	//s = smooth_subtract_c(s.w, get_sphere(p, vec3(0.3, 0.0, 1.5), 0.5), s.rgb, vec3(0.0, 1.0, 0.0), 0.1);
 	//</scene>
 	
 
@@ -330,7 +193,7 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 
 vec3 get_normal(vec3 p, float time, vec3 world_cam_pos) {
 	float d = get_scene(p, time, world_cam_pos).w;
-	vec2 e = vec2(NORMAL_PRECISION*shrink, 0.0);
+	vec2 e = vec2(NORMAL_PRECISION, 0.0);
 	vec3 n = d - vec3(
 		get_scene(p - e.xyy, time, world_cam_pos).w,
 		get_scene(p - e.yxy, time, world_cam_pos).w,
@@ -348,7 +211,7 @@ vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, ve
 		rgb = scene_info.rgb;
 		float ds = scene_info.w;
 		d += ds;
-		if (d > MAX_DISTANCE * shrink || ds < SURFACE_DISTANCE) {
+		if (d > MAX_DISTANCE || ds < SURFACE_DISTANCE) {
 			break;
 		}
 	}
@@ -378,7 +241,7 @@ void fragment() {
 	vec4 rm = raymarch(ray_origin, ray_dir, normal, time, world_cam_pos);
 	float d = rm.w;
 	
-	if (d > MAX_DISTANCE * shrink) {
+	if (d > MAX_DISTANCE) {
 		// TODO: render background shader instead
 		discard;
 	}
@@ -389,7 +252,6 @@ void fragment() {
 		
 	NORMAL = (VIEW_MATRIX * vec4(normal, 0.0)).xyz;
 	
-	//ALBEDO = mix(rm.rgb, fog_color, clamp(0.,1.,DEPTH * 100. - 99.));
-	ALBEDO = mix(rm.rgb, fog_color, clamp(0.,0.8,DEPTH * 200. - 199.));
+	ALBEDO = rm.rgb;
 	
 }
