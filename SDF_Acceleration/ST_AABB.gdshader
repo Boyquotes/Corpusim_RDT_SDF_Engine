@@ -209,7 +209,6 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 }
 
 
-
 vec3 get_normal(vec3 p, float time, vec3 world_cam_pos) {
 	float d = get_scene(p, time, world_cam_pos).w;
 	vec2 e = vec2(NORMAL_PRECISION, 0.0);
@@ -253,6 +252,50 @@ vec3 sphereProject(vec2 q){
 	return normalize(unit);	
 }
 
+bool test_bb(vec3 ray_origin,vec3 ray_dir, out vec3 tEnter, out vec3 tExit, out float edginess){
+	vec3 aabbMin = -1.*vec3(.55);
+	vec3 aabbMax = vec3(.55);
+	
+	vec3 tMin = (aabbMin - ray_origin)/ray_dir;
+	vec3 tMax = (aabbMax - ray_origin)/ray_dir;
+	
+    float tIn = max(max(min(tMin.x, tMax.x), min(tMin.y, tMax.y)), min(tMin.z, tMax.z));
+    float tOut = min(min(max(tMin.x, tMax.x), max(tMin.y, tMax.y)), max(tMin.z, tMax.z));
+
+   	if ((tIn > tOut) || (tOut < 0.)){
+		return false;
+	}
+		
+	else{
+		tEnter = ray_origin + ray_dir*tIn;
+		tExit = ray_origin + ray_dir*tOut;
+		vec3 hit = ray_origin+ray_dir*tIn;
+		edginess = 1.0 - min(
+		min(length(hit.x-aabbMin.x)+length(hit.y-aabbMin.y),
+		length(hit.y-aabbMin.y)+length(hit.z-aabbMin.z)),
+		length(hit.x-aabbMin.x)+length(hit.z-aabbMin.z));
+		
+		return true;
+	}
+}
+
+vec4 traverse_accstruct(vec3 ray_origin,vec3 ray_dir, out vec3 out_normal, float time, vec3 world_cam_pos){
+	vec3 tASEnter, tASExit;
+	float edginess = 0.;
+	vec4 trace_result = vec4(0);
+	bool hit_as = test_bb(ray_origin, ray_dir, tASEnter, tASExit, edginess);
+	if (hit_as){
+		trace_result = mix(
+			sphere_trace(ray_origin,ray_dir, out_normal, time, world_cam_pos),
+			vec4(vec3(1),10.),
+			smoothstep(0.95,1.0,edginess));
+	}
+	else{
+		trace_result = vec4(0,0,0,MAX_DISTANCE*2.0);
+	}
+	return trace_result;
+}
+
 vec3 miss_shader(vec3 dir_uv, vec2 uv){
 	//vec3 st = sphereProject(SKY_COORDS.xy);
 	//vec3 st = sphereProject1(CAMERA_DIRECTION_WORLD.xy+UV);
@@ -294,20 +337,24 @@ void fragment() {
 	float time = float(TIME);
 	
 	vec3 normal;
-	vec4 rm = sphere_trace(ray_origin, ray_dir, normal, time, world_cam_pos);
-	float d = rm.w;
+	
+	
+	vec4 trace_result = traverse_accstruct(ray_origin, ray_dir, normal, time, world_cam_pos);
+	
+	//vec4 rm = sphere_trace(ray_origin, ray_dir, normal, time, world_cam_pos);
+	float d = trace_result.w;
 	
 	vec4 sdf_ndc = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ray_origin + ray_dir * d, 1.0);
 	DEPTH = (sdf_ndc.z / sdf_ndc.w) * 0.5 + 0.5;
 		
 	
 	if (d > MAX_DISTANCE) {
-		rm.rgb = miss_shader(-CAMERA_POSITION_WORLD, UV);
+		trace_result.rgb = miss_shader(-CAMERA_POSITION_WORLD, UV);
 	}
 	else{	
 		NORMAL = (VIEW_MATRIX * vec4(normal, 0.0)).xyz;
 	}
 	
-	ALBEDO = rm.rgb;
+	ALBEDO = trace_result.rgb;
 	
 }
