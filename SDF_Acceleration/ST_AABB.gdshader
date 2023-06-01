@@ -9,7 +9,16 @@ const float MAX_DISTANCE = 100.0;
 const float SURFACE_DISTANCE = 0.005;
 const float NORMAL_PRECISION = 0.0005;
 
+vec3 mod289_3(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec2 mod289_2(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec3 permute(vec3 x) { return mod289_3(((x*34.0)+1.0)*x); }
+vec3 hash(vec3 p) {
+    p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+             dot(p, vec3(269.5, 183.3, 246.1)),
+             dot(p, vec3(113.5, 271.9, 124.6)));
 
+    return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+}
 
 void vertex() {
 	POSITION = vec4(VERTEX, 1.0);
@@ -23,6 +32,7 @@ float rand3d(vec3 p)
 {
 	return fract(sin(dot(p ,vec3(12.9898,78.233,128.852))) * 43758.5453)*2.0-1.0;
 }
+
 
 float noise3D(vec3 p)
 {
@@ -112,6 +122,14 @@ float noise3D(vec3 p)
 	
 }
 
+float fbm(vec3 p)
+{
+	float f;
+    f = noise3D(p); p*2.01;
+	f += 0.5*noise3D( p ); p = p*2.02;
+	return f;
+}
+
 float get_sphere(vec3 p, vec3 center, float radius) {
 	return length(p - center) - radius;
 }
@@ -177,7 +195,8 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	
 	
 	//<scene>
-	s.w = sharp_union(s.w, get_sphere(p, vec3(0.0), .8+.1*sin(time)));
+	//s.w = sharp_union(s.w, get_sphere(p, vec3(0.0), .8+.1*sin(time)));
+	s = vec4(vec3(0.5,0.2,0.1),sharp_union(s.w, get_sphere(p, vec3(0.0), .8+.1*sin(time))));
 	//s.w = subtract(s.w, get_sphere(p, vec3(1.0, 0.0, 0.0), 0.8));
 //	p = repeat_domain(p, vec3(3.0), vec3(5.0, 0.0, 0.0));
 //  s = smooth_union_c(s.w, get_box(p, vec3(0.1, 0.5, 1.5)), s.rgb, vec3(1.0, 0.0, 0.0), 0.3);
@@ -201,7 +220,7 @@ vec3 get_normal(vec3 p, float time, vec3 world_cam_pos) {
 	return normalize(n);
 }
 
-vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, vec3 world_cam_pos) {
+vec4 sphere_trace(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, vec3 world_cam_pos) {
 	// Sphere tracing
 	float d = 0.0;
 	vec3 rgb;
@@ -223,6 +242,43 @@ vec4 raymarch(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, ve
 	return vec4(rgb, d);
 }
 
+vec3 sphereProject(vec2 q){
+	float theta = q.y * 3.14159;
+	float phi = q.x * 3.14159 * 2.0;
+	vec3 unit = vec3(0.0, 0.0, 0.0);
+
+	unit.x = sin(phi) * sin(theta);
+	unit.y = cos(theta) * -1.0;
+	unit.z = cos(phi) * sin(theta);
+	return normalize(unit);	
+}
+
+vec3 miss_shader(vec3 dir_uv, vec2 uv){
+	//vec3 st = sphereProject(SKY_COORDS.xy);
+	//vec3 st = sphereProject1(CAMERA_DIRECTION_WORLD.xy+UV);
+	vec3 st = vec3(dir_uv.xy+uv,0);
+	float time = TIME;
+
+    vec3 color = vec3(0.0);
+    vec3 pos = vec3(st*2.);
+
+    float DF = 0.0;
+
+    // Add a random position
+    float a = 0.0;
+    vec3 vel = vec3(time)*0.5;
+	DF += fbm(pos+vel)*.25+.25;
+
+    // Add a random position
+    a = noise3D(pos* vec3(cos(time*0.15),sin(time*0.1),sin(time*0.13)) *0.1)*3.1415;
+    vel = vec3(cos(a),sin(a),sin(a));
+    DF += noise3D(pos+vel)*.25+.25;
+
+	
+	float d = smoothstep(0.3,0.8,fract(DF));
+    return vec3(0.,.4,.5)*d  + vec3(.0,.7,.1)*(1.-d);
+}
+
 void fragment() {
 	// Could certainly be optimized I think
 	vec3 ndc = vec3(SCREEN_UV, 0.0) * 2.0 - 1.0;
@@ -238,19 +294,19 @@ void fragment() {
 	float time = float(TIME);
 	
 	vec3 normal;
-	vec4 rm = raymarch(ray_origin, ray_dir, normal, time, world_cam_pos);
+	vec4 rm = sphere_trace(ray_origin, ray_dir, normal, time, world_cam_pos);
 	float d = rm.w;
-	
-	if (d > MAX_DISTANCE) {
-		// TODO: render background shader instead
-		discard;
-	}
-
 	
 	vec4 sdf_ndc = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ray_origin + ray_dir * d, 1.0);
 	DEPTH = (sdf_ndc.z / sdf_ndc.w) * 0.5 + 0.5;
 		
-	NORMAL = (VIEW_MATRIX * vec4(normal, 0.0)).xyz;
+	
+	if (d > MAX_DISTANCE) {
+		rm.rgb = miss_shader(-CAMERA_POSITION_WORLD, UV);
+	}
+	else{	
+		NORMAL = (VIEW_MATRIX * vec4(normal, 0.0)).xyz;
+	}
 	
 	ALBEDO = rm.rgb;
 	

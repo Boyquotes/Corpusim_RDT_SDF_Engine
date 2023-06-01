@@ -1,21 +1,23 @@
-[gd_scene load_steps=5 format=3 uid="uid://hcbmf8g23t06"]
+[gd_scene load_steps=6 format=3 uid="uid://hcbmf8g23t06"]
 
-[ext_resource type="Shader" path="res://SDF_Acceleration/ST_AABB.gdshader" id="1_squgk"]
+[ext_resource type="Shader" path="res://SDF_Acceleration/ST_AABB.gdshader" id="1_vhjvc"]
 [ext_resource type="Script" path="res://SDF_Acceleration/sdf_container_aabb.gd" id="7_fjpba"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rhh60"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0kkco"]
 render_priority = 0
-shader = ExtResource("1_squgk")
+shader = ExtResource("1_vhjvc")
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_jc8r8"]
-material = SubResource("ShaderMaterial_rhh60")
+[sub_resource type="PlaneMesh" id="PlaneMesh_jyfql"]
 flip_faces = true
 orientation = 2
+
+[sub_resource type="Environment" id="Environment_ylpgj"]
 
 [node name="Node3d" type="Node3D"]
 
 [node name="SDFContainer_AABB" type="MeshInstance3D" parent="."]
-mesh = SubResource("PlaneMesh_jc8r8")
+material_override = SubResource("ShaderMaterial_0kkco")
+mesh = SubResource("PlaneMesh_jyfql")
 script = ExtResource("7_fjpba")
 
 [node name="DirectionalLight3d" type="DirectionalLight3D" parent="."]
@@ -24,3 +26,6 @@ light_energy = 1.263
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.970025, 0.243006, 0, -0.243006, 0.970025, 1.19209e-07, 1.11489, 2.60139)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ylpgj")
