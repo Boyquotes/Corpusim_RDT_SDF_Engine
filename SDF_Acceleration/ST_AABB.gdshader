@@ -2,7 +2,8 @@ shader_type spatial;
 //render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
 
-
+uniform vec3 u_bb_center = vec3(0);
+uniform float u_bb_size = 0.55;
 
 const int MAX_STEPS = 64;
 const float MAX_DISTANCE = 100.0;
@@ -253,8 +254,11 @@ vec3 sphereProject(vec2 q){
 }
 
 bool test_bb(vec3 ray_origin,vec3 ray_dir, out vec3 tEnter, out vec3 tExit, out float edginess){
-	vec3 aabbMin = -1.*vec3(.55);
-	vec3 aabbMax = vec3(.55);
+	//vec3 aabbMin = -1.*vec3(.55);
+	//vec3 aabbMax = vec3(.55);
+	
+	vec3 aabbMin = -1.*vec3(u_bb_size)+u_bb_center;
+	vec3 aabbMax = vec3(u_bb_size)+u_bb_center;
 	
 	vec3 tMin = (aabbMin - ray_origin)/ray_dir;
 	vec3 tMax = (aabbMax - ray_origin)/ray_dir;

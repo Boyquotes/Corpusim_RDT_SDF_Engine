@@ -3,11 +3,13 @@
 [ext_resource type="Shader" path="res://SDF_Acceleration/ST_AABB.gdshader" id="1_vhjvc"]
 [ext_resource type="Script" path="res://SDF_Acceleration/sdf_container_aabb.gd" id="7_fjpba"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_0kkco"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vftq7"]
 render_priority = 0
 shader = ExtResource("1_vhjvc")
+shader_parameter/u_bb_center = Vector3(0, 0, 0)
+shader_parameter/u_bb_size = 0.55
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_jyfql"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_p4wf0"]
 flip_faces = true
 orientation = 2
 
@@ -16,8 +18,8 @@ orientation = 2
 [node name="Node3d" type="Node3D"]
 
 [node name="SDFContainer_AABB" type="MeshInstance3D" parent="."]
-material_override = SubResource("ShaderMaterial_0kkco")
-mesh = SubResource("PlaneMesh_jyfql")
+material_override = SubResource("ShaderMaterial_vftq7")
+mesh = SubResource("PlaneMesh_p4wf0")
 script = ExtResource("7_fjpba")
 
 [node name="DirectionalLight3d" type="DirectionalLight3D" parent="."]
