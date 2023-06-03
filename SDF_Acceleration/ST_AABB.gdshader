@@ -1,5 +1,6 @@
+#define AS_VISIBILITY true
+
 shader_type spatial;
-//render_mode unshaded;// depth_draw_never; depth_draw_opaque;
 render_mode depth_draw_opaque;
 
 uniform vec3 u_bb_center = vec3(0);
@@ -9,6 +10,7 @@ const int MAX_STEPS = 64;
 const float MAX_DISTANCE = 100.0;
 const float SURFACE_DISTANCE = 0.005;
 const float NORMAL_PRECISION = 0.0005;
+const float AS_DRAW_THICKNESS = .005;
 
 vec3 mod289_3(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 vec2 mod289_2(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -193,18 +195,7 @@ vec4 get_scene(vec3 p, float time, vec3 world_cam_pos) {
 	
 	vec3 n = vec3(0.);
 
-	
-	
-	//<scene>
-	//s.w = sharp_union(s.w, get_sphere(p, vec3(0.0), .8+.1*sin(time)));
 	s = vec4(vec3(0.5,0.2,0.1),sharp_union(s.w, get_sphere(p, vec3(0.0), .8+.1*sin(time))));
-	//s.w = subtract(s.w, get_sphere(p, vec3(1.0, 0.0, 0.0), 0.8));
-//	p = repeat_domain(p, vec3(3.0), vec3(5.0, 0.0, 0.0));
-//  s = smooth_union_c(s.w, get_box(p, vec3(0.1, 0.5, 1.5)), s.rgb, vec3(1.0, 0.0, 0.0), 0.3);
-//	s.w = subtract(s.w, get_sphere(p, vec3(0.6, 0.2, 0.5), 0.4));
-	//s = smooth_subtract_c(s.w, get_sphere(p, vec3(0.3, 0.0, 1.5), 0.5), s.rgb, vec3(0.0, 1.0, 0.0), 0.1);
-	//</scene>
-	
 
 	return s;
 }
@@ -254,9 +245,6 @@ vec3 sphereProject(vec2 q){
 }
 
 bool test_bb(vec3 ray_origin,vec3 ray_dir, out vec3 tEnter, out vec3 tExit, out float edginess){
-	//vec3 aabbMin = -1.*vec3(.55);
-	//vec3 aabbMax = vec3(.55);
-	
 	vec3 aabbMin = -1.*vec3(u_bb_size)+u_bb_center;
 	vec3 aabbMax = vec3(u_bb_size)+u_bb_center;
 	
@@ -274,10 +262,14 @@ bool test_bb(vec3 ray_origin,vec3 ray_dir, out vec3 tEnter, out vec3 tExit, out 
 		tEnter = ray_origin + ray_dir*tIn;
 		tExit = ray_origin + ray_dir*tOut;
 		vec3 hit = ray_origin+ray_dir*tIn;
-		edginess = 1.0 - min(
-		min(length(hit.x-aabbMin.x)+length(hit.y-aabbMin.y),
-		length(hit.y-aabbMin.y)+length(hit.z-aabbMin.z)),
-		length(hit.x-aabbMin.x)+length(hit.z-aabbMin.z));
+
+		edginess = step(6.0
+		-step(abs(hit.x-aabbMin.x),AS_DRAW_THICKNESS)
+		-step(abs(hit.x-aabbMax.x),AS_DRAW_THICKNESS)
+		-step(abs(hit.y-aabbMin.y),AS_DRAW_THICKNESS)
+		-step(abs(hit.y-aabbMax.y),AS_DRAW_THICKNESS)
+		-step(abs(hit.z-aabbMin.z),AS_DRAW_THICKNESS)
+		-step(abs(hit.z-aabbMax.z),AS_DRAW_THICKNESS),4.0 );
 		
 		return true;
 	}
@@ -289,10 +281,15 @@ vec4 traverse_accstruct(vec3 ray_origin,vec3 ray_dir, out vec3 out_normal, float
 	vec4 trace_result = vec4(0);
 	bool hit_as = test_bb(ray_origin, ray_dir, tASEnter, tASExit, edginess);
 	if (hit_as){
-		trace_result = mix(
-			sphere_trace(ray_origin,ray_dir, out_normal, time, world_cam_pos),
-			vec4(vec3(1),10.),
-			smoothstep(0.95,1.0,edginess));
+		if (edginess < 1.0 || AS_VISIBILITY == false){
+			trace_result = sphere_trace(ray_origin,ray_dir, out_normal, time, world_cam_pos);
+		}	
+		else{
+			trace_result = vec4(vec3(1),SURFACE_DISTANCE*2.);
+			out_normal = vec3(1);
+		}
+		
+		
 	}
 	else{
 		trace_result = vec4(0,0,0,MAX_DISTANCE*2.0);
@@ -301,8 +298,6 @@ vec4 traverse_accstruct(vec3 ray_origin,vec3 ray_dir, out vec3 out_normal, float
 }
 
 vec3 miss_shader(vec3 dir_uv, vec2 uv){
-	//vec3 st = sphereProject(SKY_COORDS.xy);
-	//vec3 st = sphereProject1(CAMERA_DIRECTION_WORLD.xy+UV);
 	vec3 st = vec3(dir_uv.xy+uv,0);
 	float time = TIME;
 
@@ -345,7 +340,6 @@ void fragment() {
 	
 	vec4 trace_result = traverse_accstruct(ray_origin, ray_dir, normal, time, world_cam_pos);
 	
-	//vec4 rm = sphere_trace(ray_origin, ray_dir, normal, time, world_cam_pos);
 	float d = trace_result.w;
 	
 	vec4 sdf_ndc = PROJECTION_MATRIX * VIEW_MATRIX * vec4(ray_origin + ray_dir * d, 1.0);
