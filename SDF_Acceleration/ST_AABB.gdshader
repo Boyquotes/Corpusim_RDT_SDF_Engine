@@ -211,7 +211,7 @@ vec3 get_normal(vec3 p, float time, vec3 world_cam_pos) {
 	return normalize(n);
 }
 
-vec4 sphere_trace(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time, vec3 world_cam_pos) {
+vec4 sphere_trace(vec3 ray_origin, vec3 ray_dir, float interval_length, out bool ST_miss, out vec3 out_normal, float time, vec3 world_cam_pos) {
 	// Sphere tracing
 	float d = 0.0;
 	vec3 rgb;
@@ -221,7 +221,12 @@ vec4 sphere_trace(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time
 		rgb = scene_info.rgb;
 		float ds = scene_info.w;
 		d += ds;
-		if (d > MAX_DISTANCE || ds < SURFACE_DISTANCE) {
+		if (d > interval_length){
+			ST_miss = true;
+			break;
+		}
+		else if (ds < SURFACE_DISTANCE) {
+			ST_miss = false;
 			break;
 		}
 	}
@@ -229,7 +234,6 @@ vec4 sphere_trace(vec3 ray_origin, vec3 ray_dir, out vec3 out_normal, float time
 	vec3 hit_pos = ray_origin + ray_dir * d;
 	out_normal = get_normal(hit_pos, time, world_cam_pos);
 	
-
 	return vec4(rgb, d);
 }
 
@@ -261,15 +265,14 @@ bool test_bb(vec3 ray_origin,vec3 ray_dir, out vec3 tEnter, out vec3 tExit, out 
 	else{
 		tEnter = ray_origin + ray_dir*tIn;
 		tExit = ray_origin + ray_dir*tOut;
-		vec3 hit = ray_origin+ray_dir*tIn;
-
+		
 		edginess = step(6.0
-		-step(abs(hit.x-aabbMin.x),AS_DRAW_THICKNESS)
-		-step(abs(hit.x-aabbMax.x),AS_DRAW_THICKNESS)
-		-step(abs(hit.y-aabbMin.y),AS_DRAW_THICKNESS)
-		-step(abs(hit.y-aabbMax.y),AS_DRAW_THICKNESS)
-		-step(abs(hit.z-aabbMin.z),AS_DRAW_THICKNESS)
-		-step(abs(hit.z-aabbMax.z),AS_DRAW_THICKNESS),4.0 );
+		-step(abs(tEnter.x-aabbMin.x),AS_DRAW_THICKNESS)
+		-step(abs(tEnter.x-aabbMax.x),AS_DRAW_THICKNESS)
+		-step(abs(tEnter.y-aabbMin.y),AS_DRAW_THICKNESS)
+		-step(abs(tEnter.y-aabbMax.y),AS_DRAW_THICKNESS)
+		-step(abs(tEnter.z-aabbMin.z),AS_DRAW_THICKNESS)
+		-step(abs(tEnter.z-aabbMax.z),AS_DRAW_THICKNESS),4.0 );
 		
 		return true;
 	}
@@ -279,19 +282,21 @@ vec4 traverse_accstruct(vec3 ray_origin,vec3 ray_dir, out vec3 out_normal, float
 	vec3 tASEnter, tASExit;
 	float edginess = 0.;
 	vec4 trace_result = vec4(0);
+	bool ST_miss = false;
 	bool hit_as = test_bb(ray_origin, ray_dir, tASEnter, tASExit, edginess);
+	float interval_length = distance(tASExit,tASEnter);
+	
 	if (hit_as){
 		if (edginess < 1.0 || AS_VISIBILITY == false){
-			trace_result = sphere_trace(ray_origin,ray_dir, out_normal, time, world_cam_pos);
+			trace_result = sphere_trace(tASEnter,ray_dir, interval_length, ST_miss, out_normal, time, world_cam_pos);
 		}	
+		// draw debug lines for AS volume
 		else{
 			trace_result = vec4(vec3(1),SURFACE_DISTANCE*2.);
 			out_normal = vec3(1);
 		}
-		
-		
 	}
-	else{
+	if (!hit_as || ST_miss){
 		trace_result = vec4(0,0,0,MAX_DISTANCE*2.0);
 	}
 	return trace_result;
